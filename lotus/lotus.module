@@ -1,0 +1,281 @@
+<?php
+
+/**
+ * Implements hook_menu().
+ */
+
+function lotus_menu() {
+ $items['hello'] = [
+      'title' => 'Hello Drupal',
+      'page callback' => '_lotus_custom_page_content',
+      'access callback' => TRUE,
+ ];
+
+ $items['offers/hot/%'] = array(
+      'title' => 'Offers Galore!',
+      'description' => 'Landing Page for Offers Page',
+      'page callback' => 'lotus_offers_page',
+      'page arguments' => array(2),
+      'access arguments' => array('access content')
+    );
+ $items['lotus/form'] = [
+      'title' => 'Lotus application',
+      'page callback' => 'drupal_get_form',
+      'page arguments' => ['_lotus_custom_form'],
+      'access arguments' => ['access content'],
+ ];
+
+ $items['lotus/form/%/edit'] = [
+      'title' => 'Lotus application',
+      'page callback' => 'drupal_get_form',
+      'page arguments' => ['_lotus_custom_form',2],
+      'access arguments' => ['access content'],
+ ];
+ $items['lotus/form/%/delete'] = array(
+      'title' => 'Delete Items',
+      'page callback' => 'drupal_get_form',
+      'page arguments' => array('_lotus_custom_form_delete', 2),
+      'access arguments' => ['access content'],
+  );
+
+return $items;
+}
+
+
+function _lotus_custom_page_content() {
+  return [
+   '#type' => 'markup',
+   '#markup' => t('Welcome to my website!'),
+  ];
+}
+
+function _lotus_custom_page_content_with_arguments($arg) {
+
+  return [
+   '#type' => 'markup',
+   '#markup' => t('Welcome to my website! your hot offer is @arg', ['@arg' => $arg]),
+  ];
+
+}
+
+/**
+ * Page callback function.
+ **/
+
+  function lotus_offers_page($count) {
+    return 'You will get ' . $count . '% discount!!' ;
+  }
+
+/**
+ * Implements hook_cron().
+ */
+
+function lotus_cron() {
+  $results = db_select('node', 'n')
+             ->fields('n', ['nid'])
+             ->condition('created', strtotime('-30 days'), '<=')
+             ->execute();
+ foreach($results as $result) {
+  $nids[] = $result->nid;
+ }
+
+ if(!empty($nids)) {
+   node_delete_multiple($nids);
+  }
+
+ drupal_set_message(t('The old node deleted now, please have look this ids @nids', ['nids' => $nids]));
+}
+
+// Callback form for lotus
+
+function _lotus_custom_form($form, &$form_state) {
+  $form = [];
+
+if (!empty($_GET['q'])) {
+    $pid = arg(2);
+    $data = _lotus_data_load($pid);
+  }
+
+  $form['name'] = [
+   '#title' => t('Your Name'),
+   '#type' => 'textfield',
+   '#required' => TRUE,
+   '#default_value' => isset($data['name']) ? $data['name'] : '',
+  ];
+  $form['surname'] = [
+    '#title' =>  t('Surname'),
+    '#type' => 'textfield',
+    '#default_value' => isset($data['surname']) ? $data['surname'] : '',
+  ];
+  $form['age'] = [
+    '#title' =>  t('Age'),
+    '#type' => 'textfield',
+    '#default_value' => isset($data['age']) ? $data['age'] : '',
+  ];
+  $form['city'] = [
+    '#title' =>  t('Your city'),
+    '#type' => 'textfield',
+    '#default_value' => isset($data['person_city']) ? $data['person_city'] : '',
+  ];
+
+  $form['action']['submit'] = [
+   '#value' => t('Submit'),
+   '#type' => 'submit',
+  ];
+
+  return $form;
+}
+
+
+// validate function for lotus form.
+
+function _lotus_custom_form_validate($form, &$form_state) {
+
+  if (!intval($form_state['values']['age'])) {
+    form_set_error('age', t('Please enter int value in age.'));
+  }
+
+}
+
+// Submit handler for lotus form.
+
+function _lotus_custom_form_submit($form, &$form_state){
+  global $user;
+  $pid = arg(2);
+  if (!empty($_GET['q']) && intval($pid)) {
+
+     $query = db_update('lotus')
+       ->fields(array(
+         'uid' => $user->uid,
+         'name' => $form_state['values']['name'],
+         'surname' => $form_state['values']['surname'],
+         'age' => $form_state['values']['age'],
+         'person_city' => $form_state['values']['city']
+       ))
+     ->condition('pid', $pid)
+     ->execute();
+    drupal_set_message("succesfully Update");
+    drupal_goto('lotus/form');
+
+  }
+  else{
+
+   $query = db_insert('lotus')
+     //->fields('lotus', array($field))
+     ->fields(array(
+       'uid' => $user->uid,
+       'name' => $form_state['values']['name'],
+       'surname' => $form_state['values']['surname'],
+       'age' => $form_state['values']['age'],
+       'person_city' => $form_state['values']['city']
+       ))
+     ->execute();
+
+    drupal_set_message("succesfully saved");
+  }
+}
+
+/**
+ * Implements hook_block_info().
+ */
+function lotus_block_info() {
+  $blocks['lotus_table'] = array(
+    'info' => t('Lotus List'),
+    'cache' => DRUPAL_NO_CACHE
+  );
+
+  return $blocks;
+}
+
+/**
+ * Implements hook_block_view().
+ */
+function lotus_block_view($delta = '') {
+  $block = array();
+
+  //create table header
+  # configure the table header columns
+  $header_table = array(
+    array('data' => 'Name', 'field' => 'name', 'sort' => 'ASC'),
+    array('data' => 'Surname', 'field' => 'surname', 'sort' => 'ASC'),
+    array('data' => 'Age', 'field' => 'age', 'sort' => 'ASC'),
+    array('data' => 'City', 'field' => 'person_city'),
+    array('data' => 'Edit', 'field' => 'edit'),
+    array('data' => 'Delete', 'field' => 'delete'),
+  );
+
+  //select records from table
+
+   $query = db_select('lotus' , 'l')
+          ->extend('PagerDefault')
+          ->extend('TableSort')
+          ->fields('l')
+          ->limit(5)
+         ->orderByHeader($header_table);
+          # TODO this call seems to be losing to orderByHeader on page load
+  $results = $query->execute()->fetchAll();
+
+  foreach ($results as $result) {
+   $rows[] = [
+     'name' => $result->name,
+     'surname' => $result->surname,
+     'age' => $result->age,
+     'person_city' => $result->person_city,
+     'edit' => l(t('Edit'), 'lotus/form/'. $result->pid .'/edit'),
+     'delete' => l(t('Delete'),  'lotus/form/'. $result->pid .'/delete'),
+   ];
+  }
+  $output = theme('table', array('header' => $header_table,
+                                 'rows' => $rows ));
+
+  # add the pager
+  $output .= theme('pager');
+
+  switch ($delta) {
+
+    case 'lotus_table':
+      $block['subject'] = t('Lotus Lists');
+      $block['content'] = $output;
+      break;
+
+  }
+  return $block;
+}
+
+// Custom function for fetch data.
+
+function _lotus_data_load($pid) {
+ $query = db_select('lotus' , 'l')
+          ->fields('l')
+          ->condition('pid', $pid);
+ $results = $query->execute()->fetchAssoc();
+
+ return $results;
+}
+
+// Delete Confrim for lotus form.
+
+function _lotus_custom_form_delete($form, &$form_state) {
+    $pid = arg(2);
+   $data = _lotus_data_load($pid);
+    $form['#pid'] = $pid;
+    $form = confirm_form($form,
+      t('Are you sure, Do you want to delete "@title"?', array('@title' => $data['name'])),
+      'lotus/form/',
+      'The action cannot be undone.',
+      'Delete',
+      'Cancel'
+    );
+    return $form;
+  }
+
+function _lotus_custom_form_delete_submit($form, &$form_state) {
+  if($form_state['values']['confirm']) {
+     $pid = $form['#pid'];
+     db_delete('lotus')
+             ->condition('pid', $pid)
+             ->execute();
+    drupal_set_message("Succesfully Deleted");
+    drupal_goto('lotus/form');
+  }
+}

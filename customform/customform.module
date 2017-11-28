@@ -1,0 +1,120 @@
+<?php
+
+/**
+ * Implements hook_menu().
+ */
+function customform_menu() {
+
+  $items['user-login'] = array(
+    'title' => 'Multiple Forms on Single Page',
+    'page callback' => 'custom_drupal_user_login_page',
+    //'access callback' => 'user_is_anonymous',
+    'access callback' => TRUE,
+  );
+
+  return $items;
+}
+
+// Callback page
+// First form.
+
+function custom_drupal_login_form($form, &$form_state) {
+   $form = [];
+   $form['login_email'] = [
+     '#title' => t('Registered Email'),
+     '#type' => 'textfield',
+     '#required' => TRUE,
+   ];
+   $form['login_password'] = [
+      '#type' => 'password',
+      '#required' => FALSE,
+      '#title' => t('Password'),
+   ];
+   $form['login_submit'] = [
+      '#type' => 'submit',
+      '#id' => 'drupal_login',
+      '#value' => t('Login'),
+   ];
+  return $form;
+}
+
+
+// Second form.
+function custom_drupal_update_form($form, &$form_state) {
+$form['registered_email'] = array(
+'#type' => 'textfield',
+'#required' => TRUE,
+'#title' => t('Registered Email'),
+);
+$form['create_password'] = array(
+'#type' => 'password',
+'#required' => FALSE,
+'#title' => t('Password'),
+);
+$form['confirm_password'] = array(
+'#type' => 'password',
+'#required' => FALSE,
+'#title' => t('Confirm Password'),
+);
+$form['submit'] = array(
+'#type' => 'submit',
+'#id' => 'drupal_signup',
+'#value' => t('Create Password'),
+);
+return $form;
+}
+
+
+//Link your both forms into theme() function.  You can also pass form elements if its necessary.
+
+function custom_drupal_user_login_page() {
+
+ $custom_drupal_login_form = drupal_get_form('custom_drupal_login_form');
+ $custom_drupal_update_form = drupal_get_form('custom_drupal_update_form');
+
+ $combine_form = array(
+  'arg1' => $custom_drupal_login_form,
+  'arg2' => $custom_drupal_update_form
+  );
+ $output = theme('custom_drupal_login_and_update', $combine_form);
+ return $output;
+}
+
+
+ /**
+ * Implements hook_theme().
+ */
+function customform_theme($existing, $type, $theme, $path) {
+
+  $items['custom_drupal_update_form'] = array(
+ 'render element' => 'form',
+ 'template' => 'custom_drupal_update_form',
+ 'path' => drupal_get_path('module', 'customform') .'/template', );
+
+  $items['custom_drupal_login_form'] = array(
+ 'render element' => 'form',
+ 'template' => 'custom_drupal_login_form',
+ 'path' => drupal_get_path('module', 'customform') .'/template', );
+
+  $items['custom_drupal_login_and_update'] = array(
+ 'template' => 'custom_drupal_login_and_update',
+ 'path' => drupal_get_path('module', 'customform') .'/template',
+ 'arguments' => array('combine_form' => NULL), );
+
+ return $items;
+
+}
+
+/**
+ * Implements Template Preprocessor For Login and Update User().
+ */
+function template_preprocess_custom_drupal_login_and_update(&$variables) {
+  $variables['arg_return_couple_form'] = drupal_render($variables['arg1']);
+  $variables['arg_first_time_login_form'] = drupal_render($variables['arg2']);
+}
+//Example 1
+function template_preprocess_custom_drupal_update_form(&$variables) {
+//dpm($variables);
+  $variables['registered_email'] = drupal_render($variables['form']['registered_email']);
+
+}

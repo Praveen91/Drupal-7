@@ -1,0 +1,4 @@
+name = Lotus Drupal
+description = Testing on drupal 7 work flow.
+core = 7.x
+package = Custom
