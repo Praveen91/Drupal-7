@@ -1,0 +1,21 @@
+<?php
+
+/**
+ * Create callback for standard ctools registration wizard.
+ */
+
+/**
+ * Implements hook_menu().
+ */
+function campusmate_signup_menu() {
+  $items['user/join'] = array(
+    'title' => 'Sign Up',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('campusmate_signup_wizard'),
+    'access arguments' => TRUE,
+    'description' => 'A campusmate sign up to a wizard multistep form.',
+    'file' => 'campusmate_signup_wizard.inc',
+  );
+
+  return $items;
+}
