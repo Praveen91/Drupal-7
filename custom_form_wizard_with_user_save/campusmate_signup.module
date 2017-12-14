@@ -1,0 +1,63 @@
+<?php
+
+/**
+ * Create callback for standard ctools registration wizard.
+ */
+
+/**
+ * Implements hook_menu().
+ */
+function campusmate_signup_menu() {
+  $items['user/register/step'] = array(
+    'title' => 'Sign Up',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('campusmate_signup_wizard'),
+    'access callback' => TRUE,
+    'description' => 'A campusmate sign up to a wizard multistep form.',
+    'file' => 'campusmate_signup_wizard.inc',
+  );
+
+  return $items;
+}
+
+/**
+ * Implements hook_menu_alter().
+ */
+function campusmate_signup_menu_alter(&$items) {
+  // Example - disable the page at user/register
+  $items['user/register']['access callback'] = FALSE;
+}
+
+/**
+ * Implements hook_theme().
+ */
+function campusmate_signup_theme(&$existing, $type, $theme, $path){
+  $hooks = array();
+   // Make user-register.tpl.php available
+  $hooks['user_register_form'] = array (
+     'render element' => 'form',
+     'path' => drupal_get_path('module','campusmate_signup'),
+     'template' => 'user-register',
+     'preprocess functions' => array('campusmate_signup_preprocess_user_register_form'),
+  );
+
+  return $hooks;
+}
+
+/**
+ * Implements hook_preprocess_HOOK().
+ */
+function campusmate_signup_preprocess_user_register_form(&$vars) {
+
+  $args = func_get_args();
+  array_shift($args);
+  $form_state['build_info']['args'] = $args;
+  $vars['form'] = drupal_build_form('user_register_form', $form_state['build_info']['args']);
+}
+
+function campusmate_signup_preprocess_campusmate_signup_wizard(&$vars) {
+  $args = func_get_args();
+  array_shift($args);
+  $form_state['build_info']['args'] = $args;
+  $vars['form'] = drupal_build_form('campusmate_signup_wizard', $form_state['build_info']['args']);
+}

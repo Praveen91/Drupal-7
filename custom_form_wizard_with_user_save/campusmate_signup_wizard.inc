@@ -1,0 +1,360 @@
+<?php
+
+/**
+ * Returns the list of steps and their associated forms.
+ */
+function _campusmate_signup_steps() {
+  return array(
+    1 => array(
+      'form' => 'campusmate_signup_wizard_select_profile',
+    ),
+    2 => array(
+      'form' => 'campusmate_signup_wizard_personal_info',
+    ),
+    3 => array(
+      'form' => 'campusmate_signup_wizard_subject_info',
+    ),
+  );
+}
+
+/**
+ * The primary formbuilder function for the wizard form.
+ */
+function campusmate_signup_wizard($form, &$form_state) {
+// Initialize a description of the steps for the wizard.
+  if (empty($form_state['step'])) {
+    $form_state['step'] = 1;
+    $form_state['step_information'] = _campusmate_signup_steps();
+  }
+  $step = &$form_state['step'];
+
+  drupal_set_title(t('Sign Up @step/3', array('@step' => $step)));
+
+  // Call the function named in $form_state['step_information'] to get the
+  // form elements to display for this step.
+  $form = $form_state['step_information'][$step]['form']($form, $form_state);
+
+  if ($step > 1) {
+    $form['prev'] = array(
+      '#type' => 'submit',
+      '#value' => t('Back'),
+      '#name' => 'prev',
+      '#submit' => array('campusmate_signup_wizard_previous_submit'),
+      '#limit_validation_errors' => array(),
+    );
+  }
+// Show the Next button only if there are more steps defined.
+  if ($step < count($form_state['step_information'])) {
+    // The Next button should be included on every step.
+    $form['next'] = array(
+      '#type' => 'submit',
+      '#value' => t('Next'),
+      '#name' => 'next',
+      '#submit' => array('campusmate_signup_wizard_next_submit'),
+    );
+  }
+  else {
+    // Just in case there are no more steps, we use the default submit handler
+    // of the form wizard. Call this button Finish, Submit, or whatever you
+    // want to show. When this button is clicked, the
+    // form_example_wizard_submit handler will be called.
+    $form['finish'] = array(
+      '#type' => 'submit',
+      '#value' => t('Finish'),
+    );
+  }
+
+  // Include each validation function defined for the different steps.
+  if (function_exists($form_state['step_information'][$step]['form'] . '_validate')) {
+    $form['next']['#validate'] = array($form_state['step_information'][$step]['form'] . '_validate');
+  }
+
+  return $form;
+}
+
+/**
+ * Submit handler for the "previous" button.
+ *
+ * This function:
+ * - Stores away $form_state['values']
+ * - Decrements the step counter
+ * - Replaces $form_state['values'] with the values from the previous state.
+ * - Forces form rebuild.
+ *
+ * You are not required to change this function.
+ *
+ * @ingroup form_example
+ */
+function campusmate_signup_wizard_previous_submit($form, &$form_state) {
+  $current_step = &$form_state['step'];
+  $form_state['step_information'][$current_step]['stored_values'] = $form_state['input'];
+  if ($current_step > 1) {
+    $current_step--;
+    $form_state['values'] = $form_state['step_information'][$current_step]['stored_values'];
+  }
+  $form_state['rebuild'] = TRUE;
+}
+
+
+/**
+ * Submit handler for the 'next' button.
+ *
+ * This function:
+ * - Saves away $form_state['values']
+ * - Increments the step count.
+ * - Replace $form_state['values'] from the last time we were at this page
+ *   or with array() if we haven't been here before.
+ * - Force form rebuild.
+ *
+ * You are not required to change this function.
+ *
+ * @ingroup form_example
+ */
+function campusmate_signup_wizard_next_submit($form, &$form_state) {
+  $current_step = &$form_state['step'];
+  $form_state['step_information'][$current_step]['stored_values'] = $form_state['values'];
+
+  if ($current_step < count($form_state['step_information'])) {
+    $current_step++;
+    if (!empty($form_state['step_information'][$current_step]['stored_values'])) {
+      $form_state['values'] = $form_state['step_information'][$current_step]['stored_values'];
+    }
+    else {
+      $form_state['values'] = array();
+    }
+    // Force rebuild with next step.
+    $form_state['rebuild'] = TRUE;
+    return;
+  }
+}
+
+
+/**
+ * Returns form elements for the 'Select Profile info' page of the wizard.
+ *
+ * This is the first step of the wizard, asking for select field
+ *
+ * @ingroup form_example
+ */
+function campusmate_signup_wizard_select_profile($form, &$form_state) {
+  $form = array();
+  $form['user_profile'] = array(
+    '#type' => 'select',
+    '#title' => t('Select your user profile'),
+    '#options' => [
+      'student' => t('Student'),
+      'tutor' => t('Tutor')
+    ],
+    '#required' => TRUE,
+  );
+  return $form;
+}
+
+/**
+ * Returns form elements for the 'personal info' page of the wizard.
+ */
+function campusmate_signup_wizard_personal_info($form, &$form_state) {
+global $user;
+
+ $form = [];
+ //$form = drupal_get_form('user_register_form');
+//krumo($form_state);
+if (isset($form_state['input']['user_profile']) && $form_state['input']['user_profile'] == 'student') {
+
+ $form['user_profile_image'] = array(
+    '#type' => 'managed_file',
+    '#title' => t('Upload Picture'),
+    '#size' => 22,
+    '#upload_location' => 'public://',
+    );
+ $form['field_full_name'] = array(
+    '#title' => 'Full Name',
+    '#type' => 'textfield',
+    '#required' => TRUE,
+
+  );
+  $form['mail'] = array(
+    '#title' => 'E-mail',
+    '#type' => 'textfield',
+    '#required' => TRUE,
+  );
+  $form['field_phone'] = array(
+    '#title' => 'Enter Mobile Number',
+    '#type' => 'textfield',
+  );
+
+  $form['pass'] = array(
+    '#type' => 'password',
+    '#maxlength' => 64,
+    '#size' => 15,
+    '#require'=>true
+  );
+  $form['pass'] = array(
+    '#type' => 'password_confirm',
+    '#size' => 25,
+    '#require'=>true
+  );
+
+}
+else{
+  $form['tutor'] = [
+   '#type' => 'markup',
+   '#markup' => t('Welcome to tutor registration form'),
+   '#suffix' => '<br>'
+  ];
+}
+
+ return $form;
+}
+function campusmate_signup_wizard_personal_info_validate($form, $form_state) {
+ if(!filter_var($form_state['values']['mail'], FILTER_VALIDATE_EMAIL)) {
+       //Invalid email!
+      form_set_error('mail', t('Email addrerss  "!name" seems to be invalid address.', array('!name' => t($form_state['values']['mail']))));
+  }
+  if (check_user_email($form_state['values']['mail'])) {
+      form_set_error('mail', t('The e-mail address  "!name" is already taken.', array('!name' => t($form_state['values']['mail']))));
+    }
+}
+
+ /**
+   * Implements function for validate if email already exists.
+   */
+  function check_user_email($email) {
+   $query = db_select('users')
+      ->fields('users', array('mail'))
+      ->condition('mail', $email);
+     return $query->execute()->fetch();
+  }
+
+
+/**
+ * Returns form elements for the 'subject info' page of the wizard.
+ */
+function campusmate_signup_wizard_subject_info($form, &$form_state) {
+ $form = [];
+ $form['subname'] = [
+  '#type' => 'textfield',
+  '#title' => t('Subject Name'),
+  '#required' => TRUE,
+  '#description' => t('Hint: Do not enter "Math", and do not leave this out.'),
+  '#default_value' => !empty($form_state['values']['subname']) ? $form_state['values']['subname'] : '',
+ ];
+ return $form;
+}
+
+
+/**
+ * Custom validation form for the 'location info' page of the wizard.
+ *
+ * This is the validation function for the second step of the wizard.
+ * The city cannot be empty or be "San Francisco".
+ *
+ * @ingroup form_example
+ */
+function campusmate_signup_wizard_subject_info_validate($form, &$form_state) {
+  if ($form_state['values']['subname'] == 'Math') {
+    form_set_error('subname', t('You were warned not to enter "Math"'));
+  }
+}
+
+
+
+/**
+ * Wizard form submit handler.
+ *
+ * This function:
+ * - Saves away $form_state['values']
+ * - Process all the form values.
+ *
+ * And now comes the magic of the wizard, the function that should handle all
+ * the inputs from the user on each different step.
+ *
+ * This demonstration handler just do a drupal_set_message() with the
+ * information collected on each different step of the wizard.
+ *
+ * @ingroup form_example
+ */
+function campusmate_signup_wizard_submit($form, &$form_state) {
+  $current_step = &$form_state['step'];
+
+  $form_state['step_information'][$current_step]['stored_values'] = $form_state['values'];
+
+
+
+
+  // In this case we've completed the final page of the wizard, so process the
+  // submitted information.
+  drupal_set_message(t('This information was collected by this wizard:'));
+  foreach ($form_state['step_information'] as $index => $value) {
+    // Remove FAPI fields included in the values (form_token, form_id and
+    // form_build_id. This is not required, you may access the values using
+    // $value['stored_values'] but I'm removing them to make a more clear
+    // representation of the collected information as the complete array will
+    // be passed through drupal_set_message().
+
+    unset($value['stored_values']['form_id']);
+    unset($value['stored_values']['form_build_id']);
+    unset($value['stored_values']['form_token']);
+
+    // Now show all the values.
+    drupal_set_message(t('Step @num collected the following values: <pre>@result</pre>',
+      array(
+        '@num' => $index,
+        '@result' => print_r($value['stored_values'], TRUE),
+      )
+    ));
+
+     if (!empty($value['stored_values']['mail'])) {
+       $mail = check_plain($value['stored_values']['mail']);
+     }
+     if (!empty($value['stored_values']['pass'])) {
+       $pass = check_plain($value['stored_values']['pass']);
+     }
+     if (!empty($value['stored_values']['user_profile_image'])) {
+       $image = check_plain($value['stored_values']['user_profile_image']);
+     }
+     if (!empty($value['stored_values']['field_full_name'])) {
+       $full_name = check_plain($value['stored_values']['field_full_name']);
+     }
+     if (!empty($value['stored_values']['field_phone'])) {
+       $phone = check_plain($value['stored_values']['field_phone']);
+     }
+
+  }
+
+
+     $username = explode('@', $mail);
+     array_pop($username);
+     $username = array_shift($username);
+     $new_user = array(
+    'name' => $username,
+    'pass' => $pass, // note: do not md5 the password
+    'mail' => $mail,
+    'picture' => $image,
+    'status' => 1,
+    'init' => $mail,
+    'access' => REQUEST_TIME,
+    'timezone' => date_default_timezone_get(),
+    'roles' => array(
+      DRUPAL_AUTHENTICATED_RID => 'student',
+      4 => 'student',
+    ),
+    'field_full_name' => array(LANGUAGE_NONE => array(
+      array(
+        'value' => $full_name
+        )
+      )),
+    'field_phone' => array(LANGUAGE_NONE => array(
+      array(
+        'value' => $phone,
+        )
+      ))
+  );
+
+// The first parameter is sent blank so a new user is created.
+
+
+  user_save('', $new_user);
+  drupal_goto('user/login');
+  drupal_set_message(t('Create account successful.'));
+}

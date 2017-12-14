@@ -1,0 +1,4 @@
+name = Campusmate signup
+description = Campusmate signup form wizard.
+core = 7.x
+package = Custom
