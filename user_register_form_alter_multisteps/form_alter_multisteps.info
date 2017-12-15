@@ -1,0 +1,4 @@
+name = Multisteps Form
+description = Customizations to the Drupal registration system for Multisteps wizard.
+core = 7.x
+package = Custom
