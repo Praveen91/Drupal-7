@@ -1,0 +1,4 @@
+name = custom_ajax_file_upload
+description = custom_ajax_file_upload
+core = 7.x
+dependencies[] = jquery_update

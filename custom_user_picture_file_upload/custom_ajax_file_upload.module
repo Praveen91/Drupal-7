@@ -1,0 +1,77 @@
+<?php
+
+/**
+ * Implements hook_menu().
+ */
+function custom_ajax_file_upload_menu() {
+
+   $items['custom_ajax_file_upload'] = array(
+    'title' => 'Custom ajax file upload',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('custom_ajax_file_upload_form'),
+    'access arguments' => array('access content'),
+  );
+
+  return $items;
+}
+
+
+function custom_ajax_file_upload_form($form, &$form_state) {
+
+$form = [];
+$form['user_picture'] = [
+  //'#title' => 'User Photo',
+  '#type' => 'file',
+  //'#upload_location' => 'public://',
+  ];
+
+ $form['submit'] = [
+   '#type' => 'submit',
+   '#value' => 'Save',
+  ];
+
+  return $form;
+}
+
+function custom_ajax_file_upload_form_validate($form, &$form_state) {
+ $file = file_save_upload('user_picture', array(
+    'file_validate_is_image' => array(),
+    'file_validate_extensions' => array('png gif jpg jpeg'),
+  ));
+  if ($file) {
+    if ($file = file_move($file, 'public://')) {
+      $form_state['values']['user_picture'] = $file;
+    }
+    else {
+      form_set_error('user_picture', t('Failed to write the uploaded file the site\'s file folder.'));
+    }
+  }
+  else {
+    form_set_error('user_picture', t('No file was uploaded.'));
+  }
+}
+
+function custom_ajax_file_upload_form_submit($form, $form_state) {
+
+  global $user;
+  $uid = $user->uid;
+  $account = user_load($uid);
+  $file = $form_state['values']['user_picture'];
+  unset($form_state['values']['user_picture']);
+  $file->status = FILE_STATUS_PERMANENT;
+  /* Check & delete if file already exist */
+  // Get file id of profile photo
+  $fid = isset($account->picture->fid) ? $account->picture->fid : '';
+  if ($fid) {
+    $exist_file = file_load($fid);
+    file_delete($exist_file, 'TRUE');
+    unset($account->picture);
+    user_save($user);
+  }
+  /* Check & delete if file already exist */
+  file_save($file);
+  file_usage_add($file, 'custom_ajax_file_upload', 'user', $user->uid);
+  $edit['picture'] = $file;
+  user_save($account, $edit);
+  drupal_set_message(t('Image uploaded successfully'));
+}
