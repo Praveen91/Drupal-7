@@ -1,6 +1,13 @@
 <?php
 
 /**
+ * Implements hook_init().
+ */
+function custom_ajax_file_upload_init() {
+//  drupal_add_js(drupal_get_path('module', 'custom_ajax_file_upload') . '/js/auto_submit.js');
+}
+
+/**
  * Implements hook_menu().
  */
 function custom_ajax_file_upload_menu() {
@@ -31,17 +38,18 @@ $form['user_picture'] = [
  ];*/
  $module_path = drupal_get_path('module', 'custom_ajax_file_upload');
 
- $form['im-container'] = array(
-        '#prefix' => '<div id="im-area">',
-        '#markup' => '<a href="#" id="edit_img">
-                        <img src="'.$module_path . '/images/upload.png" height="150" width="150" /></a>',
-        '#suffix' => '</div>',
-    );
+ if (!isset($form_state['values']['user_picture'])) {
 
+  $form['user_image'] = array(
+        '#prefix' => '<div id="user_image"><div id="im-area">',
+        '#markup' => '<a href="#">
+                        <img src="'.$module_path . '/images/upload.png" height="150" width="150" /></a>',
+        '#suffix' => '</div></div>',
+    );
+}
  $form['submit'] = [
    '#type' => 'submit',
    '#value' => 'Save',
-   //'#submit' => 'user_profile_image_submit',
    '#ajax' => array(
             'callback' => 'user_profile_image_submit',
             'wrapper' => 'im-area',
@@ -62,24 +70,20 @@ $form['user_picture'] = [
 
 
 function user_profile_image_submit($form, &$form_state) {
+global $base_url;
 $file = file_save_upload('user_picture', array('file_validate_extensions' => array('png gif jpg jpeg')), "public://", FILE_EXISTS_REPLACE);
     if ($file) {
         $file->status = FILE_STATUS_PERMANENT;
         file_save($file);
-        $form['im-container'] = array(
-            '#title' => t('Preview:'),
-            '#prefix' => '<div id="im-area">',
-            '#markup' => '<a href="#" class="test" id="edit_img">
-                           <img src="sites/default/files/'.$file->filename.
-            '" height="150" width="150" /></a>',
-            '#suffix' => '</div>',
-        );
+        $img = '<div id="im-area"><a href="#"><img src="sites/default/files/'.$file->filename .'" height="150" width="150" /></a></div>';
+        $image['user_image']['#markup'] = $img;
     } else {
         drupal_set_message('No file uploaded.');
     }
 
-    return $form['im-container'];
+    return $image['user_image'];
 }
+
 
 
 /**
@@ -98,18 +102,8 @@ function custom_ajax_file_upload_theme() {
 * Implements theme_mymodule_thumb_upload theme callback.
 */
 function theme_custom_ajax_file_upload_form($variables) {
-
   $form = $variables['form'];
-
-  unset($form['user_picture']['#theme_wrappers']);
   $output = '';
-  /*$output .= '<div class="user_pic_imgbg">
-                 <div class="user_pic_img">
-                   <a href="#" id="edit_img" class="btn edit_btn">
-                   <span>Your Photo</span>
-                   </a>
-                 </div>
-             </div>';*/
              $output .= ' <div class= "user_img" style="display:none;">
              <div>' . drupal_render($form['user_picture']) . '</div>
              <div>' . drupal_render($form['submit']) . '</div>
