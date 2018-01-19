@@ -1,0 +1,4 @@
+name = Campusmate Tutor Profile
+description = Tutor profile update functions.
+core = 7.x
+package = CampusMate

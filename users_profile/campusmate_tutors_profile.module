@@ -1,0 +1,580 @@
+<?php
+
+/**
+ * Implements hook_menu().
+ */
+function campusmate_tutors_profile_menu() {
+
+  $items['edit-profile'] = array(
+    'title' => 'Edit Profile',
+    'page callback' => 'tutor_update_account_page',
+    'access arguments' => array('tutor:*:update'),
+    'type' => MENU_LOCAL_ACTION,
+  );
+
+  return $items;
+}
+
+/**
+ * Implements hook_permission().
+ */
+function campusmate_tutors_profile_permission() {
+  return array(
+    'tutor:*:update' =>  array(
+      'title' => t('Update Tutor Account'),
+    ),
+  );
+}
+
+/**
+ * Implement hook_form.
+ * PERSONAL INFO form.
+ */
+function tutor_profile_info_form($form, &$form_state) {
+   global $user;
+   $fname = _campusmate_tutor_profile_load('field_personal_information', 'field_tutor_first_name');
+   $form = [];
+   $form['tutor_fname'] = [
+     '#title' => t('First Name'),
+     '#type' => 'textfield',
+     '#required' => TRUE,
+     '#attributes' => [
+       'placeholder' => t('First Name'),
+      ],
+      '#default_value' => isset($fname) ? $fname : ''
+   ];
+   $lname = _campusmate_tutor_profile_load('field_personal_information', 'field_tutor_last_name');
+   $form['tutor_lname'] = [
+     '#title' => t('Last Name'),
+     '#type' => 'textfield',
+     '#required' => TRUE,
+     '#attributes' => [
+       'placeholder' => t('Last Name'),
+      ],
+      '#default_value' => isset($lname) ? $lname : ''
+   ];
+   $form['tutor_email'] = [
+     '#title' => t('Email'),
+     '#type' => 'textfield',
+     '#required' => TRUE,
+     '#attributes' => [
+       'placeholder' => t('Email'),
+      ],
+      '#disabled' => TRUE,
+      '#default_value' => isset($user->mail) ? $user->mail : ''
+   ];
+   $mobile = _campusmate_tutor_profile_load('field_personal_information', 'field_mobile');
+   $form['tutor_mobile'] = [
+     '#title' => t('Mobile No'),
+     '#type' => 'textfield',
+     '#required' => TRUE,
+     '#attributes' => [
+       'placeholder' => t('Mobile No'),
+      ],
+     '#default_value' => isset($mobile) ? $mobile : ''
+   ];
+   $form['pass'] = array(
+    '#type' => 'password',
+    '#maxlength' => 64,
+    '#require'=>true,
+   );
+   $form['pass'] = array(
+    '#type' => 'password_confirm',
+    '#size' => 25,
+    '#require'=>true,
+  );
+   $form['tutor_picture_up'] = [
+    '#type' => 'file',
+     '#name' => 'files[tutor_picture_up]',
+   ];
+    if (!isset($form_state['values']['user_picture'])) {
+
+   $form['tutor_picture_default'] = array(
+        '#prefix' => '<div id="display-user-profile">',
+        '#markup' => '<a href="#">
+                        <img class="white-border-8" src="' . default_profile_pic_update($user->uid) . '">
+                      </a>',
+        '#suffix' => '</div>',
+    );
+   }
+   $form['tutor_picture_submit'] = [
+    '#type' => 'button',
+    '#value' => t('Upload'),
+     '#ajax' => array(
+            'callback' => 'tutor_profile_image_submit',
+            'wrapper' => 'display-user-profile',
+        ),
+   ];
+   $form['submit'] = [
+      '#type' => 'submit',
+      '#value' => t('Save'),
+   ];
+  return $form;
+}
+
+/**
+ * Implement tutor_profile_image_submit().
+ */
+function tutor_profile_image_submit($form, &$form_state) {
+global $user, $base_url;
+$file = file_save_upload('tutor_picture_up', array('file_validate_extensions' => array('png gif jpg jpeg')), "public://", FILE_EXISTS_REPLACE);
+    if ($file) {
+        $file->status = FILE_STATUS_PERMANENT;
+        file_save($file);
+        $form_state['values']['tutor_fid'] = $file->fid;
+        $img = '<div id="display-user-profile"><img class="white-border-8" src="sites/default/files/'.$file->filename .'" /></div>';
+        $image['user_image']['#markup'] = $img;
+
+    // Save profile 2 tutor profile image.
+    $tutor_profile = profile2_by_uid_load($user->uid, 'tutor_profile');
+    $profile_wrapper = entity_metadata_wrapper('profile2', $tutor_profile);
+    $raw_collection = $profile_wrapper->field_personal_information->value();
+    $raw_collection->field_profile_image['und'][0]['fid'] = $file->fid;
+    $raw_collection->save();
+    drupal_set_message(t('Your Profile photo has been changed successfully'));
+
+    } else {
+        drupal_set_message('No file uploaded.');
+    }
+
+    return $image['user_image'];
+}
+
+
+/**
+ * Implement hook_form_validate.
+ * PERSONAL INFO form.
+ */
+function tutor_profile_info_form_validate($form, &$form_state){
+
+  if (empty($form_state['values']['tutor_fname'])) {
+      form_set_error('tutor_fname', t('Please enter Your First Name.'));
+   }
+  if (empty($form_state['values']['tutor_lname'])) {
+      form_set_error('tutor_lname', t('Please enter Your Last Name.'));
+   }
+}
+
+/**
+ * Implement hook_form_submit.
+ * PERSONAL INFO form.
+ */
+function tutor_profile_info_form_submit($form, &$form_state){
+  global $user;
+  $account = user_load($user->uid); // Loading account
+  if (!empty($form_state['values']['pass'])) {
+    $edit = [
+      'pass' => $form_state['values']['pass'], // note: do not md5 the password
+    ];
+    user_save($account, $edit);
+    drupal_set_message(t('Your password has been changed successfully'));
+  }
+
+    $tutor_profile = profile2_by_uid_load($user->uid, 'tutor_profile');
+    $profile_wrapper = entity_metadata_wrapper('profile2', $tutor_profile);
+    $raw_collection = $profile_wrapper->field_personal_information->value();
+    $collection = entity_metadata_wrapper('field_collection_item', $raw_collection);
+    $collection->field_tutor_first_name = $form_state['values']['tutor_fname'];
+    $collection->field_tutor_last_name = $form_state['values']['tutor_lname'];
+    $collection->field_mobile = $form_state['values']['tutor_mobile'];
+    $collection->save();
+
+}
+
+/**
+ * Implement hook_form().
+ * LANGUAGES Forms.
+ */
+function tutor_profile_languages_form($form, &$form_state) {
+//kpr(_campusmate_tutor_profile_load('field_personal_information', 'field_profile_image'));
+  $form['others_language'] = array(
+    '#type' => 'select',
+    '#title' => t('Other language'),
+    '#options' => _campusmate_tutors_profile_get_languages_term(),
+  );
+
+  $form['submit'] = array(
+    '#type' => 'submit',
+    '#value' => t('Save Language'),
+  );
+
+  return $form;
+}
+
+/**
+ * Implement hook_form_validate().
+ * LANGUAGES Forms.
+ */
+function tutor_profile_languages_form_validate($form, &$form_state) {
+  if (empty($form_state['values']['others_language'])) {
+    drupal_set_message(t('Please select your language.'));
+  }
+}
+
+/**
+ * Implement hook_form_submit().
+ * LANGUAGES Forms.
+ */
+function tutor_profile_languages_form_submit($form, &$form_state) {
+  if (!empty($form_state['values']['others_language'])) {
+   // Save profile 2 tutor language save.
+    global $user;
+    $tutor_profile = profile2_by_uid_load($user->uid, 'tutor_profile');
+    $profile_wrapper = entity_metadata_wrapper('profile2', $tutor_profile);
+    $raw_collection = $profile_wrapper->field_personal_information->value();
+    $collection = entity_metadata_wrapper('field_collection_item', $raw_collection);
+    $tid = array('tid' => $form_state['values']['others_language']);
+    $raw_collection->field_tutor_other_languages['und'][] = $tid;
+    $raw_collection->save();
+      drupal_set_message(t('Your language has been added successfully.'));
+   }
+}
+/**
+ * Implement hook_form.
+ * Tutor Background.
+ */
+function tutor_profile_background_form($form, &$form_state) {
+ global $language;
+ if ($language->language == 'en') {
+    $field_heading = _campusmate_tutor_profile_load('field_personal_information', 'field_heading');
+  } else {
+    $field_heading = _campusmate_tutor_profile_load('field_personal_information', 'field_heading_chinese');
+  }
+
+ $form['tutor_background'] = array(
+    '#type' => 'textarea',
+    '#required' => TRUE,
+    '#title' => t('Background'),
+    '#default_value' => isset($field_heading) ? $field_heading : '',
+    '#rows' => 10,
+  );
+
+  $form['submit'] = array(
+  '#type' => 'submit',
+  '#value' => t('Save Background'),
+  );
+return $form;
+}
+
+/**
+ * Implement hook_form_validate.
+ */
+function tutor_profile_background_form_validate($form, &$form_state) {
+  if (empty($form_state['values']['tutor_background'])) {
+    form_set_error('tutor_background', t('Please enter your background info.'));
+  }
+}
+
+/**
+ * Implement hook_form_submit()
+ * Save background.
+ */
+function tutor_profile_background_form_submit($form, &$form_state) {
+   if (isset($form_state['values']['tutor_background']) && !empty($form_state['values']['tutor_background'])) {
+    global $user, $language;
+    $tutor_profile = profile2_by_uid_load($user->uid, 'tutor_profile');
+    $profile_wrapper = entity_metadata_wrapper('profile2', $tutor_profile);
+    $raw_collection = $profile_wrapper->field_personal_information->value();
+    $collection = entity_metadata_wrapper('field_collection_item', $raw_collection);
+    if ($language->language == 'en') {
+      $collection->field_heading = $form_state['values']['tutor_background'];
+    }else{
+      $collection->field_heading_chinese = $form_state['values']['tutor_background'];
+    }
+    $collection->save();
+    drupal_set_message(t('Your background summary has been updated successfully.'));
+    }
+}
+
+/**
+ * Implement hook_form()
+ * Tutor Education form.
+ */
+function tutor_profile_education_form($form, &$form_state) {
+
+  $attach_form = array();
+  $field_collection = entity_create('field_collection_item', array('field_name' => 'field_education'));
+
+  $fields = [
+    'field_course',
+    'field_city',
+    'field_country',
+    'field_field_of_study',
+    'field_country',
+    'field_degree_level',
+    'field_tutor_institute'
+  ];
+foreach ($fields as $fieldname) {
+  field_attach_form('field_collection_item', $field_collection, $attach_form, $form_state, array('field_name' => $fieldname));
+}
+
+$form['field_city'] = $attach_form['field_city'];
+$form['field_course'] = $attach_form['field_course'];
+$form['field_country'] = $attach_form['field_country'];
+$form['field_field_of_study'] = $attach_form['field_field_of_study'];
+$form['field_country'] = $attach_form['field_country'];
+$form['field_degree_level'] = $attach_form['field_degree_level'];
+$form['field_tutor_institute'] = $attach_form['field_tutor_institute'];
+
+$form['field_degree_level']['und']['#options']['_none'] = t('Degree Level');
+$form['field_field_of_study']['und']['#options']['_none'] = t('Field of Study');
+$form['field_country']['und']['#options']['_none'] = t('Country');
+
+$form['submit'] = array(
+  '#type' => 'submit',
+  '#value' => t('Save Education'),
+  );
+return $form;
+}
+
+/**
+ * Implement hook_form_submit()
+ * Tutor Education form.
+ */
+function tutor_profile_education_form_submit($form, &$form_state) {
+
+ global $user;
+  // Load the profile we're adding the field to
+  $profile_entity = profile2_load_by_user($user->uid, 'tutor_profile');
+
+  // Define the values of the new field
+  $values = array();
+  $values['field_name'] = 'field_education'; // field collection name
+  $values['field_city']['und'][0]['value'] = $form_state['values']['field_city']['und'][0]['value'];
+  $values['field_course']['und'][0]['value'] = $form_state['values']['field_course']['und'][0]['value'];
+  $values['field_country']['und'][0]['iso2'] = $form_state['values']['field_country']['und'][0]['iso2'];
+  $values['field_field_of_study']['und'][0]['tid'] = $form_state['values']['field_field_of_study']['und'][0]['tid'];
+  $values['field_degree_level']['und'][0]['tid'] = $form_state['values']['field_degree_level']['und'][0]['tid'];
+  $values['field_tutor_institute']['und'][0]['tid'] = $form_state['values']['field_tutor_institute']['und'][0]['tid'];
+
+
+  // Create the field collection entry and associate it with the profile
+  $field_entity = entity_create('field_collection_item', $values);
+  $field_entity->setHostEntity('profile2', $profile_entity);
+  $field_entity->save();
+  drupal_set_message(t('Your education has been added successfully.'));
+}
+
+/**
+ * Implement hook_form()
+ * Tutor Work experience form.
+ */
+function tutor_profile_work_experience_form($form, &$form_state) {
+
+$attach_form = array();
+  $field_collection = entity_create('field_collection_item', array('field_name' => 'field_work_experience'));
+
+  $fields = [
+    'field_job_title',
+    'field_occupational_field',
+    'field_employment_type',
+    'field_company_name',
+    'field_country',
+    'field_city',
+    'field_work_start_time',
+    'field_work_end_time',
+    'field_work_present_time'
+  ];
+foreach ($fields as $fieldname) {
+  field_attach_form('field_collection_item', $field_collection, $attach_form, $form_state, array('field_name' => $fieldname));
+}
+
+$form['field_job_title'] = $attach_form['field_job_title'];
+$form['field_occupational_field'] = $attach_form['field_occupational_field'];
+$form['field_employment_type'] = $attach_form['field_employment_type'];
+$form['field_company_name'] = $attach_form['field_company_name'];
+$form['field_country'] = $attach_form['field_country'];
+$form['field_city'] = $attach_form['field_city'];
+//$form['field_work_start_time'] = $attach_form['field_work_start_time'];
+//$form['field_work_end_time'] = $attach_form['field_work_end_time'];
+//$form['field_work_present_time'] = $attach_form['field_work_present_time'];
+
+$form['field_occupational_field']['und']['#options']['_none'] = t('Occupational');
+$form['field_employment_type']['und']['#options']['_none'] = t('Employment Type');
+//$form['field_country']['und']['#options']['_none'] = t('Country');
+
+
+  $form['submit'] = array(
+  '#type' => 'submit',
+  '#value' => t('SAVE EXPERIENCE'),
+  );
+return $form;
+}
+
+/**
+ * Implement hook_form_submit()
+ * Tutor Work experience form..
+ */
+function tutor_profile_work_experience_form_submit($form, &$form_state) {
+//kpr($form_state['values']); exit();
+ global $user;
+  // Load the profile we're adding the field to
+  $profile_entity = profile2_load_by_user($user->uid, 'tutor_profile');
+
+  // Define the values of the new field
+  $values = array();
+  $values['field_name'] = 'field_work_experience'; // field collection name
+  $values['field_job_title']['und'][0]['value'] = $form_state['values']['field_job_title']['und'][0]['value'];
+  $values['field_occupational_field']['und'][0]['tid'] = $form_state['values']['field_occupational_field']['und'][0]['tid'];
+
+  $values['field_employment_type']['und'][0]['tid'] = $form_state['values']['field_employment_type']['und'][0]['tid'];
+  $values['field_company_name']['und'][0]['tid'] = $form_state['values']['field_company_name']['und'][0]['tid'];
+
+  $values['field_country']['und'][0]['iso2'] = $form_state['values']['field_country']['und'][0]['iso2'];
+   $values['field_city']['und'][0]['value'] = $form_state['values']['field_city']['und'][0]['value'];
+
+
+  // Create the field collection entry and associate it with the profile
+  $field_entity = entity_create('field_collection_item', $values);
+  $field_entity->setHostEntity('profile2', $profile_entity);
+  $field_entity->save();
+ drupal_set_message(t('Your experience has been added successfully.'));
+}
+
+/**
+ * Implements Page callback.
+ * Link Tutors forms into theme() function.
+ */
+function tutor_update_account_page() {
+
+ $tutor_profile_info_form = drupal_get_form('tutor_profile_info_form');
+ $tutor_profile_languages_form = drupal_get_form('tutor_profile_languages_form');
+ $tutor_profile_background_form = drupal_get_form('tutor_profile_background_form');
+ $tutor_profile_education_form = drupal_get_form('tutor_profile_education_form');
+ $tutor_profile_work_experience_form = drupal_get_form('tutor_profile_work_experience_form');
+
+ $combine_form = array(
+  'arg1' => $tutor_profile_info_form,
+  'arg2' => $tutor_profile_languages_form,
+  'arg3' => $tutor_profile_background_form,
+  'arg4' => $tutor_profile_education_form,
+  'arg5' => $tutor_profile_work_experience_form
+  );
+ $output = theme('tutor_update_account_forms_page', $combine_form);
+ return $output;
+}
+
+/**
+ * Implements hook_theme().
+ */
+function campusmate_tutors_profile_theme($existing, $type, $theme, $path) {
+
+  $items['tutor_profile_info_form'] = array(
+ 'render element' => 'form',
+ 'template' => 'tutor_profile_info_form',
+ 'path' => drupal_get_path('module', 'campusmate_tutors_profile') .'/template', );
+
+  $items['tutor_profile_languages_form'] = array(
+ 'render element' => 'form',
+ 'template' => 'tutor_profile_languages_form',
+ 'path' => drupal_get_path('module', 'campusmate_tutors_profile') .'/template', );
+
+  $items['tutor_profile_background_form'] = array(
+ 'render element' => 'form',
+ 'template' => 'tutor_profile_background_form',
+ 'path' => drupal_get_path('module', 'campusmate_tutors_profile') .'/template', );
+
+  $items['tutor_profile_education_form'] = array(
+ 'render element' => 'form',
+ 'template' => 'tutor_profile_education_form',
+ 'path' => drupal_get_path('module', 'campusmate_tutors_profile') .'/template', );
+
+  $items['tutor_profile_work_experience_form'] = array(
+ 'render element' => 'form',
+ 'template' => 'tutor_profile_work_experience_form',
+ 'path' => drupal_get_path('module', 'campusmate_tutors_profile') .'/template', );
+
+  $items['tutor_update_account_forms_page'] = array(
+ 'template' => 'tutor_update_account_forms_page',
+ 'path' => drupal_get_path('module', 'campusmate_tutors_profile') .'/template',
+ 'arguments' => array('combine_form' => NULL), );
+
+ return $items;
+
+}
+
+function template_preprocess_tutor_profile_info_form(&$variables) {
+//dpm($variables);
+  /*$profile = _campusmate_tutor_profile_load('field_personal_information', 'field_profile_image');
+  kpr($profile);
+  $variables['pic_uri'] = $profile['uri'];*/
+
+
+}
+
+/**
+ * Implements Template Preprocessor For tutor account forms().
+ */
+function template_preprocess_tutor_update_account_forms_page(&$variables) {
+  $variables['tutor_info'] = drupal_render($variables['arg1']);
+  $variables['tutor_languages'] = drupal_render($variables['arg2']);
+  $variables['tutor_background'] = drupal_render($variables['arg3']);
+  $variables['tutor_education'] = drupal_render($variables['arg4']);
+  $variables['work_experience'] = drupal_render($variables['arg5']);
+}
+
+/**
+* Implement profile2 data load for current user.
+*/
+
+function _campusmate_tutor_profile_load($field_collection, $field_name) {
+
+  global $user;
+  $tutor_profile = profile2_by_uid_load($user->uid, 'tutor_profile');
+  $profile_wrapper = entity_metadata_wrapper('profile2', $tutor_profile);
+  $raw_collection = $profile_wrapper->$field_collection->value();
+
+  $collection = entity_metadata_wrapper('field_collection_item', $raw_collection);
+  //kpr($raw_collection);
+  $field_output = $collection->$field_name->value();
+
+  return $field_output;
+}
+
+
+/**
+ * Implements hook_form_alter().
+ */
+function campusmate_tutors_profile_form_alter(&$form, &$form_state, $form_id) {
+  switch ($form_id) {
+    case 'tutor_profile_info_form':
+    $form['pass']['#process'] = array('form_process_password_confirm', 'register_alter_password_confirm');
+      break;
+    /*case 'tutor_profile_info_form':
+    $form
+      break;*/
+  }
+}
+
+/**
+ * Implement _campusmate_tutors_profile_get_languages_term.
+ */
+function _campusmate_tutors_profile_get_languages_term() {
+ // Remove already added language from dropdown.
+  $others_lang = _campusmate_tutor_profile_load('field_personal_information', 'field_tutor_other_languages');
+
+  foreach ($others_lang as $key) {
+    $unset_keys[] = $key->tid;
+  }
+
+ $term_output[''] = t('Language Level');
+ $lang_terms = campusmate_taxonomy_terms('languages');
+  foreach ($lang_terms as $lang_term ) {
+     if(!in_array($lang_term->tid, $unset_keys)) {
+       $term_output[$lang_term->tid] = $lang_term->name;
+   }
+  }
+ return $term_output;
+}
+
+/**
+ * Find terms based on taxonomy.
+ */
+function campusmate_taxonomy_terms($machine_name = "") {
+  $all_terms = [];
+  if (!empty($machine_name)) {
+    $vid = taxonomy_vocabulary_machine_name_load($machine_name)->vid;
+    $all_terms = entity_load('taxonomy_term', FALSE, array('vid' => $vid));
+  }
+  return $all_terms;
+}
