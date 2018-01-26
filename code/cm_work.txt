@@ -204,7 +204,71 @@ if ($form_id == 'views_exposed_form' && $form_state['view']->name == 'tutor_list
    }
 }
 
-function autocomplete_tutor_subject_callback($string = "") {
+function autocomplete_tutor_subject
+/**
+ * Implements hook_token_info().
+ */
+function campusmate_views_token_info() {
+
+  // Add tokens.
+  $view['subject_name'] = array(
+    'name' => t('Subject Details page title'),
+    'description' => t('Page title for Subject Details page'),
+  );
+
+   $view['tutor_name'] = array(
+    'name' => t('Tutor Name'),
+    'description' => t('Tutor name for page title'),
+  );
+
+  return array(
+    'tokens' => array(
+      'view' => $view,
+    ),
+  );
+}
+
+/**
+ * Implements hook_tokens().
+ */
+function campusmate_views_tokens($type, $tokens, array $data = array(), array $options = array()) {
+
+  $replacements = array();
+
+ if ($type == 'view') {
+
+    foreach ($tokens as $name => $original) {
+      switch ($name) {
+        case 'subject_name':
+       if ( arg(0) == 'subjectdetail' && is_numeric(arg(1))) {
+          $tid = arg(1);
+          $term = taxonomy_term_load($tid);
+          $sub_term_name = $term->name;
+          $replacements[$original] = $sub_term_name;
+        }
+          break;
+          case 'tutor_name':
+          if ( arg(0) == 'tutor-details' && is_numeric(arg(1))) {
+            $tutor_id = arg(1);
+            $tutor_profile = profile2_by_uid_load($tutor_id, 'tutor_profile');
+            $profile_wrapper = entity_metadata_wrapper('profile2', $tutor_profile);
+            $raw_collection = $profile_wrapper->field_personal_information->value();
+            $fname = $raw_collection->field_tutor_first_name['und'][0]['value'];
+            $lname = $raw_collection->field_tutor_last_name['und'][0]['value'];
+            $lname = substr($lname,0,1);
+            $tutor_short_name  = $fname .' '. $lname . '.';
+            $replacements[$original] = $tutor_short_name;
+          }
+            break;
+      }
+    }
+  }
+
+  // Return the replacements.
+  return $replacements;
+}
+
+_callback($string = "") {
 
   $query = db_select('taxonomy_term_data', 'ttd');
   $query->distinct();
@@ -218,6 +282,72 @@ function autocomplete_tutor_subject_callback($string = "") {
       $matches[$subject->name . ""] = check_plain($subject->name);
     }
     drupal_json_output($matches);
+}
+
+
+
+
+/**
+ * Implements hook_token_info().
+ */
+function campusmate_views_token_info() {
+
+  // Add tokens.
+  $view['subject_name'] = array(
+    'name' => t('Subject Details page title'),
+    'description' => t('Page title for Subject Details page'),
+  );
+
+   $view['tutor_name'] = array(
+    'name' => t('Tutor Name'),
+    'description' => t('Tutor name for page title'),
+  );
+
+  return array(
+    'tokens' => array(
+      'view' => $view,
+    ),
+  );
+}
+
+/**
+ * Implements hook_tokens().
+ */
+function campusmate_views_tokens($type, $tokens, array $data = array(), array $options = array()) {
+
+  $replacements = array();
+
+ if ($type == 'view') {
+
+    foreach ($tokens as $name => $original) {
+      switch ($name) {
+        case 'subject_name':
+       if ( arg(0) == 'subjectdetail' && is_numeric(arg(1))) {
+          $tid = arg(1);
+          $term = taxonomy_term_load($tid);
+          $sub_term_name = $term->name;
+          $replacements[$original] = $sub_term_name;
+        }
+          break;
+          case 'tutor_name':
+          if ( arg(0) == 'tutor-details' && is_numeric(arg(1))) {
+            $tutor_id = arg(1);
+            $tutor_profile = profile2_by_uid_load($tutor_id, 'tutor_profile');
+            $profile_wrapper = entity_metadata_wrapper('profile2', $tutor_profile);
+            $raw_collection = $profile_wrapper->field_personal_information->value();
+            $fname = $raw_collection->field_tutor_first_name['und'][0]['value'];
+            $lname = $raw_collection->field_tutor_last_name['und'][0]['value'];
+            $lname = substr($lname,0,1);
+            $tutor_short_name  = $fname .' '. $lname . '.';
+            $replacements[$original] = $tutor_short_name;
+          }
+            break;
+      }
+    }
+  }
+
+  // Return the replacements.
+  return $replacements;
 }
 
 
