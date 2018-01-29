@@ -1,0 +1,140 @@
+<?php
+
+/**
+ * Implements hook_menu().
+ */
+function custom_form_menu() {
+   $items['custom/form'] = array(
+    'title' => 'Custom Form',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('_custom_form_callback'),
+    'access arguments' => array('content access'),
+  );
+
+  return $items;
+}
+
+function _custom_form_callback($form, &$form_state) {
+  $form = [];
+
+  $form['name'] = [
+    '#title' => t('Name'),
+    '#type' => 'textfield',
+    '#required' => TRUE,
+  ];
+
+  $form['email'] = [
+    '#title' => t('Email ID'),
+    '#type' => 'textfield',
+    '#required' => TRUE,
+  ];
+
+  $form['submit'] = [
+   '#type' => 'submit',
+   '#value' => t('Submit'),
+  ];
+
+  return $form;
+}
+
+
+// Validate csutom form.
+
+function _custom_form_callback_validate($form, &$form_state) {
+  if (strlen($form_state['values']['name']) > 100) {
+    form_set_error('name', t('Maximum length should be 100 characters.'));
+  }
+
+  if ( !preg_match ("/^[a-zA-Z\s]+$/", $form_state['values']['name'])) {
+  form_set_error('name', t('Name must only contain letters!.'));
+  }
+
+  if (!valid_email_address($form_state['values']['email'])) {
+    form_set_error('email', t('Invlid email.'));
+  }
+}
+
+
+// Submit csutom form.
+
+function _custom_form_callback_submit($form, &$form_state) {
+    $name = $form_state['values']['name'];
+    $email = $form_state['values']['email'];
+
+        $query = db_insert('mydata')
+            ->fields(array(
+              'name' => $name,
+              'email' => $email,
+            ))
+           ->execute();
+   drupal_set_message(t('Data saved'));
+}
+
+
+function load_data() {
+  $query = db_select('mydata', 'my')
+          ->fields('my')
+          ->execute();
+   $results = $query->fetchAll();
+
+  return $results;
+
+}
+
+/**
+ * Implements hook_block_info().
+ */
+function custom_form_block_info() {
+
+  $blocks['custom_block'] = array(
+    'info' => t('Form Data'),
+    'cache' => DRUPAL_NO_CACHE
+  );
+
+  return $blocks;
+}
+
+
+/**
+ * Implements hook_block_view().
+ */
+function custom_form_block_view($delta = '') {
+  $block = array();
+
+  //create table header
+  # configure the table header columns
+  $header_table = array(
+    array('data' => 'Id', 'field' => 'id'),
+    array('data' => 'Name', 'field' => 'name'),
+    array('data' => 'Email', 'field' => 'email'),
+  );
+
+  $datas = load_data();
+
+  foreach ($datas as $data) {
+    //dsm($data);
+    $rows[] = [
+     'id' => $data->id,
+     'name' => $data->name,
+     'email' => $data->email,
+];
+
+
+}
+
+  $output = theme('table', array('header' => $header_table,
+                                 'rows' => $rows ));
+
+  switch ($delta) {
+     case 'custom_block':
+      $block['subject'] = t('Form data');
+      $block['content'] = $output;
+      break;
+
+  }
+  return $block;
+}
+
+
+
+
