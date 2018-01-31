@@ -127,23 +127,7 @@ function campus_add_to_checkout(){
     global $user;
     
     $classroom_id = $_POST['class_id'];
-    $product_id = $_POST['pa
-/**
- * Implements hook_menu().
- */
-function campusmate_views_menu() {
-
-  $items['tutor/subject/field_select_subjects'] = array(
-   'title' => 'Autocomplete deluxe taxonomy',
-    'page callback' => 'autocomplete_tutor_subject_callback',
-    'access arguments' => array('access content'),
-    'type' => MENU_CALLBACK,
-
-  );
-
-  return $items;
-}
-ck_id'];
+    $product_id = $_POST['pack_id'];
     $quantity   = 1;
     if ($product = commerce_product_load($product_id)) {
         
@@ -161,6 +145,31 @@ ck_id'];
     drupal_set_message(t('Error occured during adding product to cart! Try to use Add to cart button.'));
   }
     echo "success";
+}
+
+
+
+/**
+ * Implements hook_menu().
+ */
+function campusmate_views_menu() {
+
+  $items['tutor/subject/field_select_subjects'] = array(
+   'title' => 'Autocomplete deluxe taxonomy',
+    'page callback' => 'autocomplete_tutor_subject_callback',
+    'access arguments' => array('access content'),
+    'type' => MENU_CALLBACK,
+    
+  $items['papers_pub_search/keywords_autocomplete'] = array(
+   'title' => 'Autocomplete deluxe taxonomy',
+    'page callback' => '_autosearch',
+    'access arguments' => array('access content'),
+    'type' => MENU_CALLBACK,
+  );
+
+  );
+
+  return $items;
 }
 
 
@@ -204,71 +213,14 @@ if ($form_id == 'views_exposed_form' && $form_state['view']->name == 'tutor_list
    }
 }
 
-function autocomplete_tutor_subject
-/**
- * Implements hook_token_info().
- */
-function campusmate_views_token_info() {
+For only autocomlete ::
 
-  // Add tokens.
-  $view['subject_name'] = array(
-    'name' => t('Subject Details page title'),
-    'description' => t('Page title for Subject Details page'),
-  );
+$form['field_select_subjects_tid'] = array(
+    '#type' => 'textfield',
+    '#autocomplete_path' => 'tutor/subject/field_select_subjects',
+    );
 
-   $view['tutor_name'] = array(
-    'name' => t('Tutor Name'),
-    'description' => t('Tutor name for page title'),
-  );
-
-  return array(
-    'tokens' => array(
-      'view' => $view,
-    ),
-  );
-}
-
-/**
- * Implements hook_tokens().
- */
-function campusmate_views_tokens($type, $tokens, array $data = array(), array $options = array()) {
-
-  $replacements = array();
-
- if ($type == 'view') {
-
-    foreach ($tokens as $name => $original) {
-      switch ($name) {
-        case 'subject_name':
-       if ( arg(0) == 'subjectdetail' && is_numeric(arg(1))) {
-          $tid = arg(1);
-          $term = taxonomy_term_load($tid);
-          $sub_term_name = $term->name;
-          $replacements[$original] = $sub_term_name;
-        }
-          break;
-          case 'tutor_name':
-          if ( arg(0) == 'tutor-details' && is_numeric(arg(1))) {
-            $tutor_id = arg(1);
-            $tutor_profile = profile2_by_uid_load($tutor_id, 'tutor_profile');
-            $profile_wrapper = entity_metadata_wrapper('profile2', $tutor_profile);
-            $raw_collection = $profile_wrapper->field_personal_information->value();
-            $fname = $raw_collection->field_tutor_first_name['und'][0]['value'];
-            $lname = $raw_collection->field_tutor_last_name['und'][0]['value'];
-            $lname = substr($lname,0,1);
-            $tutor_short_name  = $fname .' '. $lname . '.';
-            $replacements[$original] = $tutor_short_name;
-          }
-            break;
-      }
-    }
-  }
-
-  // Return the replacements.
-  return $replacements;
-}
-
-_callback($string = "") {
+function autocomplete_tutor_subject_callback($string = "") {
 
   $query = db_select('taxonomy_term_data', 'ttd');
   $query->distinct();
@@ -284,72 +236,105 @@ _callback($string = "") {
     drupal_json_output($matches);
 }
 
+$form['keywords'] = array(
+  '#type' => 'textfield',
+  '#title' => t('Keywords'),
+  '#size' => '40',
+  '#multiple' => TRUE,
+  '#autocomplete_path' => 'papers_pub_search/keywords_autocomplete'
+);
 
+function _autosearch($string) {
+  $matches = array();
 
+  if ($string) {
+    $items = array_map('trim', explode(',', $string));
+    $last_item = array_pop($items);
+    $prefix = implode(', ', $items);
 
-/**
- * Implements hook_token_info().
- */
-function campusmate_views_token_info() {
-
-  // Add tokens.
-  $view['subject_name'] = array(
-    'name' => t('Subject Details page title'),
-    'description' => t('Page title for Subject Details page'),
-  );
-
-   $view['tutor_name'] = array(
-    'name' => t('Tutor Name'),
-    'description' => t('Tutor name for page title'),
-  );
-
-  return array(
-    'tokens' => array(
-      'view' => $view,
-    ),
-  );
-}
-
-/**
- * Implements hook_tokens().
- */
-function campusmate_views_tokens($type, $tokens, array $data = array(), array $options = array()) {
-
-  $replacements = array();
-
- if ($type == 'view') {
-
-    foreach ($tokens as $name => $original) {
-      switch ($name) {
-        case 'subject_name':
-       if ( arg(0) == 'subjectdetail' && is_numeric(arg(1))) {
-          $tid = arg(1);
-          $term = taxonomy_term_load($tid);
-          $sub_term_name = $term->name;
-          $replacements[$original] = $sub_term_name;
-        }
-          break;
-          case 'tutor_name':
-          if ( arg(0) == 'tutor-details' && is_numeric(arg(1))) {
-            $tutor_id = arg(1);
-            $tutor_profile = profile2_by_uid_load($tutor_id, 'tutor_profile');
-            $profile_wrapper = entity_metadata_wrapper('profile2', $tutor_profile);
-            $raw_collection = $profile_wrapper->field_personal_information->value();
-            $fname = $raw_collection->field_tutor_first_name['und'][0]['value'];
-            $lname = $raw_collection->field_tutor_last_name['und'][0]['value'];
-            $lname = substr($lname,0,1);
-            $tutor_short_name  = $fname .' '. $lname . '.';
-            $replacements[$original] = $tutor_short_name;
-          }
-            break;
-      }
+    $result = db_select('users')
+       ->fields('users', array('name'))
+       ->condition('name', '%' . db_like($last_item) . '%', 'LIKE')
+       ->range(0, 10)->execute();
+    foreach ($result as $user) {
+      $value = !empty($prefix) ? $prefix . ', ' . $user->name : $user->name;
+      $matches[$value] = check_plain($value);
     }
   }
 
-  // Return the replacements.
-  return $replacements;
+  drupal_json_output($matches);
 }
 
 
+How to attach profile2 fields in custom form :
+----------------------------------------------
+
+global $user;
+  if (!isset($form_state['profile'])) {
+    $profile = profile2_load_by_user($user, 'profile_machine_name');
+    if (!$profile) {
+      $profile = profile_create(array(
+        'type' => 'profile_machine_name',
+        'uid' => $user->uid
+      ));
+    }
+    $form_state['profiles'][$profile->type] = $profile;
+  }
+
+    // Use field attach form and handle the fields yourself:
+    //field_attach_form('profile2', $profile, $form, $form_state);
+    // Or use profile2 API which is simpler
+     profile2_attach_form($form, $form_state);
 
 
+
+
+Creating tables relations in Views programmatically :
+----------------------------------------------------
+
+
+/**
+ *  Implements hook_views_data_alter()
+ */
+ 
+Example one
+
+function you_module_views_data_alter(&$data) {
+  $data['the_name_of_your_custom_table']['the_name_of_your_custom_table'] = array(
+    'title' => t('This is what you see on Relationships Views area'),
+    'help' => t('A sentence to help the user explain what is this.'),
+    // here where the magic begins
+    'relationship' => array(
+      'base' => 'users',  // the core table that you join in.
+      'base field' => 'uid',  // the field name of the core table that make the relation.
+      'field' => 'my_custom_id',  // the field name of YOUR table related with the core table.
+      'handler' => 'views_handler_relationship',  // default
+      'label' => t('UID vs my custom table.'),  // Some text showed on the Views Fields area. 
+    ),
+  );		
+}
+
+Example two
+
+// Two tables pm_message , pm_index
+
+function timekit_api_views_data() {
+   $data = array();
+$data['pm_message']['mid'] = array(
+     'title' => t('pm_message'),
+     'relationship' => array(
+       'base' => 'pm_index',
+       'base field' => 'mid',
+       'handler' => 'views_handler_relationship',
+       'label' => t('pm_index'),
+     ),
+   );
+   
+   
+   return $data;
+}
+
+Drupal snippets code : 
+http://dropbucket.org/node/6738
+
+https://www.thirdandgrove.com/creating-a-custom-views-relationship-for-drupal-commerce-orders

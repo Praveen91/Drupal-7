@@ -116,5 +116,4 @@ function template_preprocess_custom_drupal_login_and_update(&$variables) {
 function template_preprocess_custom_drupal_update_form(&$variables) {
 //dpm($variables);
   $variables['registered_email'] = drupal_render($variables['form']['registered_email']);
-
 }
