@@ -1,0 +1,23 @@
+Useful command for Drupal using drush.
+---------------------------------------
+
++ Setup Drupal Project +
+
+drush dl drupal-7.x --drupal-project-rename=d7_dev
+cd d7_local
+
+// Create database
+mysqladmin -u root -p create d7_dev
+
+Now Install site
+drush si standard --db-url='mysql://root:root@localhost/d7_dev' --site-name=d7_dev --account-name=admin --account-pass=admin
+y
+Installation complete. *** Enjoy ***
+
++ Now Setup Vartual host for project in ubuntu +
+
+v host.txt check out
+
+drush vset theme_default themename
+
+

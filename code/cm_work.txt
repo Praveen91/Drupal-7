@@ -338,3 +338,41 @@ Drupal snippets code :
 http://dropbucket.org/node/6738
 
 https://www.thirdandgrove.com/creating-a-custom-views-relationship-for-drupal-commerce-orders
+
+
+
+What are Drupal Behaviors?
+---------------------------
+Drupal has a behaviors’ system to provide 
+better way for attaching JavaScript functionality to place elements on a page
+Drupal Behaviors allows you to override or extend the existing behavior.
+
+Drupal 7 has two handles:
+
+• To add an element to a page, you use ‘attach’
+
+• To remove an element, you use ‘detach’
+
+settings:
+The use of settings is to pass values from PHP to Javascript.
+
+ // Set variable PHP varaible for fullcalendar.
+
+  $php_var_name = t('REMAINING');
+  drupal_add_js(array('myModule' => array('var_name' => $php_var_name)), 'setting');
+
+
+Now you can use this code in your JS file:
+
+ Drupal.behaviors.myModule =  {
+        attach: function (context) {
+        console.log(Drupal.settings.myModule.var_name);
+     }
+  }
+http://www.faichi.com/blog/what-are-drupal-behaviors
+
+How To Create A Custom Filter Handler In Views
+
+
+How about mailchimp ?
+

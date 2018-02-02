@@ -1,0 +1,120 @@
+Install Solr 
+------------
+Ref - https://www.howtoforge.com/tutorial/how-to-install-and-configure-solr-on-ubuntu-1604/
+
+To install Solr Java Runtime Environment (JRE) version 1.7 or higher is needed. Note : bcoz solr build using java envi.
+
+On your terminal you can check by
+
+$ java -version
+
+If JRE availabe it will show you version of Java JRE. other wise you need to install JRE
+
+$ sudo apt-get -y install openjdk-7-jdk
+$ mkdir /usr/java
+$ ln -s /usr/lib/jvm/java-7-openjdk-amd64  /usr/java/default
+
+Now we have JRE installed, lets install Solr.
+
+Note You can choose you solr version by http://archive.apache.org/dist/lucene/solr/
+But D7 only suport >= 5 not 6
+and D8 <= 5 not 4
+
+$ cd /opt
+$ wget http://archive.apache.org/dist/lucene/solr/5.5.5/solr-5.5.5.tgz
+
+tar xzf solr-5.5.5.tgz solr-5.5.5/bin/install_solr_service.sh --strip-components=2
+
+sudo ./install_solr_service.sh solr-5.5.5.tgz
+
+
+
+The output will be similar to this:
+
+root@server1:/tmp# sudo ./install_solr_service.sh solr-6.0.1.tgz
+id: ‘solr’: no such user
+Creating new user: solr
+Adding system user `solr' (UID 111) ...
+Adding new group `solr' (GID 117) ...
+Adding new user `solr' (UID 111) with group `solr' ...
+Creating home directory `/var/solr' ...
+
+Extracting solr-6.0.1.tgz to /opt
+
+
+Installing symlink /opt/solr -> /opt/solr-6.0.1 ...
+
+
+Installing /etc/init.d/solr script ...
+
+
+Installing /etc/default/solr.in.sh ...
+
+? solr.service - LSB: Controls Apache Solr as a Service
+ Loaded: loaded (/etc/init.d/solr; bad; vendor preset: enabled)
+ Active: active (exited) since Fri 2016-06-03 11:37:05 CEST; 5s ago
+ Docs: man:systemd-sysv-generator(8)
+ Process: 20929 ExecStart=/etc/init.d/solr start (code=exited, status=0/SUCCESS)
+
+Jun 03 11:36:43 server1 systemd[1]: Starting LSB: Controls Apache Solr as a Service...
+Jun 03 11:36:44 server1 su[20934]: Successful su for solr by root
+Jun 03 11:36:44 server1 su[20934]: + ??? root:solr
+Jun 03 11:36:44 server1 su[20934]: pam_unix(su:session): session opened for user solr by (uid=0)
+Jun 03 11:37:05 server1 solr[20929]: [313B blob data]
+Jun 03 11:37:05 server1 solr[20929]: Started Solr server on port 8983 (pid=20989). Happy searching!
+Jun 03 11:37:05 server1 solr[20929]: [14B blob data]
+Jun 03 11:37:05 server1 systemd[1]: Started LSB: Controls Apache Solr as a Service.
+Service solr installed.
+
+
+
+Now Solr Installed
+
+http://127.0.0.1:8983/solr/#/
+
+Now Configure solr with drupal
+------------------------------
+
+Set permmsion is not permit or you can use terminal
+
+/var/solr
+
+Case Apachesolr -> 
+/var/www/drupal-dev/sites/all/modules/contrib/apachesolr/solr-conf/solr-5.x
+
+Case Searchapi ->
+/var/www/drupal-dev/sites/all/modules/contrib/search_api_solr/solr-conf/solr-5.x 
+
+capy all files from here to /var/solr/data/drupal/conf
+
+Now create core here http://127.0.0.1:8983/solr/#/~cores
+
+
+For windows os Other ref - https://www.youtube.com/watch?v=mycpAuvWWDY
+
+sudo service solr restart
+
+For : Search API Solr Search
+
+https://www.drupal.org/project/search_api_solr
+https://www.drupal.org/project/search_api
+https://www.drupal.org/project/search_api_db
+https://www.drupal.org/project/search_api_autocomplete
+https://www.drupal.org/project/search_api_views
+https://www.drupal.org/project/search_api_facetapi
+
+
+For : Apache Solr Search
+
+https://www.drupal.org/project/apachesolr
+https://www.drupal.org/project/apachesolr_autocomplete
+
+For : Drupal Commerce
+
+https://www.drupal.org/project/commerce_search_api
+
+Custom code
+https://getlevelten.com/blog/kristin-brinner/drupal-commerce-how-set-search-api-search-skus-and-without-dashes
+
+https://munich2012.drupal.org/sites/default/files/slides/Drupalcon%20Munich%202012_1.pdf
+https://beautiful7mind.wordpress.com/2013/03/10/step-by-step-how-to-implement-facet-search-on-data-in-drupal-7/
