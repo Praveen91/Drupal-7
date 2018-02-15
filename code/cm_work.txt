@@ -480,3 +480,21 @@ $output = '';
      });
 
 
+Generate translation file for a custom drupal7 module
+------------------------------------------------------
+https://stackoverflow.com/questions/5231496/how-to-generate-translation-file-for-a-custom-drupal-7-module
+
+
+These should be the steps:
+
+1 .To generate the .pot file, install the module Translation template extractor
+
+2. Go to the "Extract strings" tab on the Locale administration interface, select your module and submit the form. You will get one single template file generated.
+
+3. Then you can translate the strings with a tool like Poedit (http://www.poedit.net).
+
+4. When you are done, files should be copied to a "translations" sub-folder in the module folder, so they are automatically imported by Drupal when installing your game module.
+
+Please, give feedback and tell what problems did you have. Thanks
+
+
