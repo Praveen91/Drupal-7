@@ -497,4 +497,42 @@ These should be the steps:
 
 Please, give feedback and tell what problems did you have. Thanks
 
+How do I merge changes from a development copy of the site to the live site without losing new content?
+-------------------------------------------------------------------------------------------------------
+For content types, views, and structure changes on the dev site look at using Features to export the database to code.
+
+For content migration there are many options, but not a single solid solution. One example is the Deployment suite.
+
+Look into using drush. A command line tool which can sync files and databases.
+------------------------------------------------------------------------------
+
+How To Import & Export Databases Using Drush
+--------------------------------------------
+Step1: Before you import your database, make sure you clear out the old database tables using the following command:
+
+drush sql-drop
+This will drop all tables and make room for our new database.
+
+ 
+
+Step 2: Next, run the following command:
+
+drush sql-cli < /path/to/databasename.sql
+Since I usually store my database folder just beneath my drupal directory, it usually looks something like this:
+
+drush sql-cli < ../database/databasename.sql
+ 
+
+Step 3: Now that we have that part mastered, you will probably want to periodically backup your database during development using the following command:
+
+drush sql-dump > ../database/databasebackupname.sql
+This will export your database to the database folder and will name it “databasebackup”.
+https://cheekymonkeymedia.ca/blog/importing-and-exporting-databases-drush
+
+Building a custom realtime chat module for Drupal 7
+---------------------------------------------------
+
+
+
+
 
