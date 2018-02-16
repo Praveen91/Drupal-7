@@ -1,0 +1,10 @@
+//mymodule/css/webform_1.css
+.reason-icon {
+  position: absolute;
+  right: 1em;
+  top: 0;
+}
+.reason-icon i {
+  font-size: 50px;
+  padding: 30px;
+}

@@ -1,0 +1,47 @@
+<?php
+
+/**
+ * Implements hook_permission().
+ */
+function example_chat_permission() {
+  return array(
+    'access example chat' =>  array(
+      'title' => t('Access Example Chat'),
+      'description' => t('Allow access to the subsystem'),
+    ),
+  );
+}
+
+/**
+ * Implements hook_menu().
+ */
+function example_chat_menu() {
+  $items['chat'] = array(
+    'title' => 'Example chat',
+    'page callback' => 'example_chat_page',
+    'access arguments' => array('access example chat'),
+    'type' => MENU_CALLBACK,
+  );
+
+  return $items;
+}
+
+/**
+ * Implements hook_theme().
+ */
+function example_chat_theme($existing, $type, $theme, $path) {
+  return array(
+    'example_chat' => array(
+      'templete' => 'example_chat',
+      'arguments' => array('username' => NULL),
+    ),
+  );
+}
+
+/**
+ * Page Callback for chat menu item.
+ */
+function example_chat_page() {
+  global $user;
+  return theme('example_chat', array('username' => $user->name));
+}

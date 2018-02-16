@@ -1,0 +1,36 @@
+.user_pic_img {
+    background: #f2f0f1;
+    border-radius: 50%;
+    overflow: hidden;
+    width: 150px;
+    height: 150px !important;
+    display: inline-block;
+    cursor: pointer;
+}
+
+.user_pic_imgbg {
+    padding-top: 30px;
+    width: 100%;
+    text-align: center;
+}
+
+.user_pic_img .edit_btn {
+    /* background-color: rgba(0, 0, 0, 0.3)!important; */
+    background-color: transparent !important;
+    transition: none!important;
+    background-position: center top;
+    overflow: hidden;
+    border-color: transparent !important;
+    margin-top: -37px;
+    width: 96px;
+    height: 92px;
+}
+
+.user_pic_img a {
+    transition: none;
+    background: url(../images/camera1.png) no-repeat center top 1px!important;
+    position: relative;
+    background-size: 72%!important;
+    box-shadow: none;
+}
+

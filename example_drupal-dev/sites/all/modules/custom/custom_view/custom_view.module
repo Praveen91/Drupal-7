@@ -1,0 +1,86 @@
+<?php
+
+/**
+ * Implementation of hook_views_api().
+ */
+function custom_view_views_api() {
+  return array(
+    'api' => 3,
+  );
+}
+
+/**
+ * Implements hook_views_data_alter().
+ */
+function custom_view_views_data_alter(&$data) {
+  //kpr($data);
+  $data['node']['title_count']['title'] = 'Title word count';
+  $data['node']['title_count']['help'] = 'Count the number of words in titles.';
+  $data['node']['title_count']['filter']['handler'] = 'custom_view_handler_filter_field_count';
+}
+
+
+/**
+ * Implements hook_views_data()
+ * Exposes our playcount table to views
+ */
+function custom_view_views_data() {
+  // Basic table information.
+  $data['my_video_playcount'] = array(
+    'table' => array(
+      'group' => t('File statistics'),
+      'join' => array(
+        'file_managed' => array(
+          'left_field' => 'fid',
+          'field' => 'file_fid',
+        ),
+      ),
+    )
+  );
+
+  // Our fields
+  $data['my_video_playcount']['playcount'] = array(
+    'title' => t('Playcount'),
+    'help' => t('The total number of times the video has been started.'),
+  );
+
+  // Adds our field in the "Fields" section of Views
+  $data['my_video_playcount']['playcount']['field'] = array(
+    'handler' => 'views_handler_field_numeric',
+    'click sortable' => TRUE,
+  );
+
+  // Adds our field in the "Filters" section of Views
+  $data['my_video_playcount']['playcount']['filter'] = array(
+    'handler' => 'views_handler_filter_numeric',
+  );
+
+  // Adds our field in the "Sort" section of Views
+  $data['my_video_playcount']['playcount']['sort'] = array(
+    'handler' => 'views_handler_sort',
+  );
+
+  return $data;
+}
+
+
+/**
+ * This hook allows to alter the commands which are used on a views ajax
+ * request.
+ *
+ * @param $commands
+ *   An array of ajax commands
+ * @param $view view
+ *   The view which is requested.
+ */
+function custom_view_views_ajax_data_alter(&$commands, $view) {
+  // Replace Views' method for scrolling to the top of the element with your
+  // custom scrolling method.
+  foreach ($commands as &$command) {
+if ($command['command'] == 'viewsScrollTop') {
+  $command['command'] = 'customViewsScrollTop';
+}
+  }
+}
+
+

@@ -1,0 +1,399 @@
+<?php
+
+/*
+
+function ajaxforms_init() {
+
+ drupal_add_js(drupal_get_path('module', 'ajaxforms') . '/js/auto_upload.js');
+
+}
+*/
+
+/**
+ * @file
+ * Creating ajax form and hundler fuction.
+ */
+
+function ajaxforms_menu() {
+  $items['ajaxforms'] = array(
+    'title' => 'Ajax Form with insert db {site_user} table ',
+    'description' => 'Ajax form example',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('ajaxforms_basic'),
+    'access callback' => TRUE,
+  );
+
+   $items['ajaxforms_basic_validate'] = array(
+    'title' => 'Ajax Form with validation',
+    'description' => 'Ajax form example',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('example_form'),
+    'access callback' => TRUE,
+  );
+
+  $items['ajaxfile'] = array(
+    'title' => 'Ajax File upload ',
+    'description' => 'Ajax form example',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('testmodule_forma'),
+    'access callback' => TRUE,
+  );
+
+  $items['admin/config/people/user_warn'] = array(
+    'title' => 'User Warn',
+    'description' => 'Admin form',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('admin_basic_form'),
+    'access arguments' => array('administer users'),
+  );
+
+	return $items;
+}
+
+
+
+function admin_basic_form($form, &$form_state) {
+
+$form = array();
+
+$form['user_warn_setting'] = array(
+ '#title' => t('People Warn Setting'),
+ '#type' => 'textfield',
+ '#default_value' => variable_get('user_warn_setting', 'Arun'),
+  );
+
+return system_settings_form($form);
+
+
+}
+
+/**
+ * Build form for callback ajaxforms
+ */
+
+function ajaxforms_basic($form, &$form_state) {
+   $form = array();
+
+  $user_data = get_user_data();
+
+ $file_one = file_load($user_data->image_file);
+ $file_two = file_load($user_data->image_file_manage);
+
+  dpm($user_data->image_file_manage);
+   $form['#prefix'] = '<div id="custom-ajax-form">'; //wrapper that will be replaced in ajax callback
+   $form['#suffix'] = '</div>';
+
+  $form['username'] = array(
+    '#title' => t('Username'),
+    '#type' => 'textfield',
+    '#required' => TRUE,
+    '#default_value' => isset($user_data->username) ? $user_data->username : '',
+  	);
+
+  $form['email'] = array(
+      '#type' => 'textfield',
+      '#title' => t('E-mail'),
+      '#default_value' => isset($user_data->email) ? $user_data->email : '',
+      '#required' => TRUE,
+    );
+
+  $form['password'] = array(
+    '#title' => t('Password'),
+    '#type' => 'textfield',
+    '#default_value' => isset($user_data->password) ? $user_data->password : '',
+    '#required' => TRUE,
+
+  	);
+
+ $form['im-container'] = array(
+        '#prefix' => '<div id="im-area">',
+        '#suffix' => '</div>',
+    );
+if (!empty($file_one)) {
+
+ $form['im-container-image'] = array(
+            '#title' => t('Preview:'),
+            '#prefix' => '<div id="im-area">',
+            '#markup' => '<img src="sites/default/files/'.$file_one->filename.
+            '" height="100" width="100" />',
+            '#suffix' => '</div>',
+ );
+}
+    $form['image_file'] = array(
+        '#type' => 'file',
+        '#title' => t('Choose a file'),
+        '#size' => 22,
+        '#name' => 'image_upload',
+        //'#default_value' => $file_one->fid,
+    );
+
+    $form['image_file_manage'] = array(
+       '#type' => 'managed_file',
+        '#title' => t('Choose a managed file'),
+        '#size' => 22,
+        '#upload_location' => 'public://',
+        '#default_value' => isset($user_data->image_file_manage) ? $user_data->image_file_manage : '',
+         '#theme' => 'ajaxforms_image_file_manage',
+    );
+
+    $form['upload'] = array(
+        '#type' => 'submit',
+        '#value' => 'upload',
+        '#name' => 'image_sub',
+        '#submit' => array('upload_image'),
+        '#ajax' => array(
+            'callback' => 'upload_image',
+            'wrapper' => 'im-area',
+            'method' => 'replace',
+            'effect' => 'fade',
+        ),
+        '#element_validate' => array('_file_generic_settings_max_filesize'),
+    );
+
+  $form['submit'] = array(
+    '#value' => t('Save'),
+    '#type' => 'submit',
+    '#ajax' => array(
+        'callback' => 'ajaxforms_basic_callback',
+        'wrapper' => 'custom-ajax-form',
+        'effect' => 'fade',
+      ),
+
+  	);
+
+
+  return $form;
+}
+
+function ajaxforms_basic_callback($form, &$form_state) {
+ return $form;
+ }
+
+function ajaxforms_basic_validate($form, &$form_state) {
+  // $form_state['input'] = array(); //remove user inputted values from form fields
+  // $form_state['rebuild'] = TRUE; //rebuild form
+    if (!valid_email_address($form_state['values']['email'])) {
+    //form_set_error('email', t('That e-mail address is not valid.'));
+  }
+
+}
+
+function ajaxforms_basic_submit($form, &$form_state) {
+
+//drupal_set_message('<pre>' . print_r($form_state['values']['image_file'], 1) . '</pre>');
+
+//$file = file_save_upload('image_file');
+
+   global $user;
+
+   if ($form_state['values']['username'] != '' && $form_state['values']['password'] != '') {
+
+  /* $nid = db_insert('site_user') // Table name no longer needs {}
+         ->fields(array(
+              'uid' => $user->uid,
+              'username' => $form_state['values']['username'],
+              'password' => $form_state['values']['password'],
+          ))
+         ->condition('uid', $user->uid, '=')
+          ->execute();*/
+  /*$file=$form_state['values']['image_file'];
+  unset($form_state['values']['image_file']);
+  $file->status = FILE_STATUS_PERMANENT;
+  drupal_set_message('<pre>' . print_r($file, 1) . '</pre>');
+  file_save($file);*/
+if (isset($form_state['values']['image_file'])) {
+ $image_file = file_save_upload('image_file', array('file_validate_extensions' => array('png gif jpg jpeg')), "public://", FILE_EXISTS_REPLACE);
+ if ($image_file) {
+   $file = file_load($image_file->fid);
+    $file->status = FILE_STATUS_PERMANENT;
+    file_save($file);
+ }
+}
+
+if (isset($form_state['values']['image_file_manage'])) {
+    $file = file_load($form_state['values']['image_file_manage']);
+    $file->status = FILE_STATUS_PERMANENT;
+    file_save($file);
+ }
+    $query = db_merge('site_user')
+        ->key(array('uid' => $user->uid))
+        ->fields(array(
+            'uid' => $user->uid,
+            'username' => $form_state['values']['username'],
+            'password' => $form_state['values']['password'],
+            'email' => $form_state['values']['email'],
+            'image_file' => $image_file->fid,
+            'image_file_manage' => $form_state['values']['image_file_manage'],
+        ))
+        ->execute();
+
+  // $form_state['input'] = array(); //remove user inputted values from form fields
+  // $form_state['rebuild'] = TRUE; //rebuild form
+
+  if (!form_get_errors()) {
+     //$element = $form['mywrapper'];
+     //$element['#markup'] = "Thank you for contacting us. Someone will be in contact with you shortly.";
+     }
+  }
+}
+
+function get_user_data() {
+  global $user;
+  $query = db_select('site_user')
+           ->fields('site_user', array('uid', 'username', 'password', 'email','image_file','image_file_manage'))
+           ->condition('uid', $user->uid, '=');
+    $result =  $query->execute()->fetch();
+
+   if ($result) {
+     return $result;
+   } else {
+     return [];
+   }
+
+}
+
+
+
+function upload_image($form, $form_state) {
+
+    $file = file_save_upload('image_file', array('file_validate_extensions' => array('png gif jpg jpeg')), "public://", FILE_EXISTS_REPLACE);
+    if ($file) {
+        $file->status = FILE_STATUS_PERMANENT;
+        file_save($file);
+        $form['im-container'] = array(
+            '#title' => t('Preview:'),
+            '#prefix' => '<div id="im-area">',
+            '#markup' => '<img src="sites/default/files/'.$file->filename.
+            '" height="250" width="250" />',
+            '#suffix' => '</div>',
+        );
+    } else {
+        drupal_set_message('No file uploaded.');
+    }
+
+    return $form['im-container'];
+}
+
+
+
+
+
+
+
+
+function example_form($_data=NULL){
+  $form['#prefix'] = '<div id="example-form-form">';
+  $form['#suffix'] = '</div>';
+
+  $form['mywrapper']['username'] = array(
+    '#type' => 'textfield',
+    '#title' => t('User`s username'),
+    '#required' => TRUE,
+  );
+  $form['mywrapper']['email'] = array(
+    '#type' => 'textfield',
+    '#title' => t('E-mail'),
+    '#required' => TRUE,
+  );
+
+ $form['im-container-picture'] = array(
+        '#prefix' => '<div id="im-area-test">',
+        '#suffix' => '</div>',
+    );
+
+  $form['mywrapper']['picture'] = array(
+    '#type' => 'managed_file',
+    '#title' => t('User Profile'),
+    '#required' => TRUE,
+    '#upload_location' => 'public://',
+    '#theme' => 'ajaxforms_thumb_upload',
+  );
+
+  $form['mywrapper']['picture']['#title_display'] = 'invisible';
+
+
+  /*$form['mywrapper']['picture']['#attached']['js'] = array(
+  drupal_get_path('module', 'ajaxforms') . '/js/auto_upload.js',
+  );*/
+
+kpr($form);
+  $form['submit'] = array(
+        '#type' => 'submit',
+        '#value' => t('Submit'),
+        '#ajax' => array(
+            'callback' => 'example_form_callback',
+            'wrapper' => 'example-form-form'
+        )
+    );
+  return $form;
+}
+
+
+/**
+* Implements hook_theme().
+*/
+function ajaxforms_theme() {
+  return array(
+    'ajaxforms_thumb_upload' => array(
+      'render element' => 'element',
+    ),
+    'ajaxforms_image_file_manage' => array(
+      'render element' => 'element',
+    )
+  );
+}
+
+
+/**
+* Implements theme_mymodule_thumb_upload theme callback.
+*/
+function theme_ajaxforms_thumb_upload($variables) {
+ $element = $variables['element'];
+
+ kpr($element);
+    $output = '';
+    $output .= '<div class="user_pic_imgbg">
+                       <div class= "user_pic_img">
+                          <div>
+                             <a href="#" id="edit_img" class="btn edit_btn">
+
+                              <span>Your Photo</span>
+                              </a></div></div>
+                          </div>
+                    <div class= "user_img" style="display:none;">'
+                          . drupal_render($element['upload'])
+
+                          . drupal_render($element['upload_button']); '</div>
+
+
+                </div>';
+
+return $output;
+
+}
+
+function theme_ajaxforms_image_file_manage($variables) {
+ kpr($variables);
+}
+
+
+function example_form_callback ($form, &$form_state) {
+  return $form;
+}
+function example_form_validate($form, &$form_state) {
+if (!valid_email_address($form_state['values']['email'])) {
+  form_set_error('email', t('That e-mail address is not valid.'));
+}
+}
+function example_form_submit($form, &$form_state) {
+  if (!form_get_errors()) {
+
+    $element = $form['mywrapper'];
+    $element['#markup'] = "Thank you for contacting us. Someone will be in contact with you shortly.";
+  }
+  else {
+    $element = $form['mywrapper']; // this must be done, otherwise the form doesn't get rebuilt and no errors are displayed.
+  }
+
+return $element;
+}

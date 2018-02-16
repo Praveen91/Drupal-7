@@ -1,0 +1,36 @@
+<?php
+
+/**
+ * Implements hook_schema_alter().
+ */
+function custom_ajax_schema_alter(&$schema) {
+  // Add field to existing schema.
+
+   $schema['site_user']['fields']['email'] = array(
+        'type' => 'varchar',
+        'length' => 254,
+        'not null' => FALSE,
+        'default' => '',
+        'description' => "User's e-mail address.",
+   );
+}
+
+
+/**
+ * Implements hook_install().
+ */
+function custom_ajax_install() {
+  $schema = drupal_get_schema('site_user');
+  db_add_field('site_user', 'email', $schema['fields']['email']);
+}
+
+
+/**
+ * Implements hook_uninstall().
+ */
+function custom_ajax_uninstall() {
+  /*
+   *variable_del('upload_file_types');
+   */
+  db_drop_field('site_user', 'email');
+}

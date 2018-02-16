@@ -1,0 +1,3 @@
+name = Global
+description = Function for Global sites
+core = 7.x

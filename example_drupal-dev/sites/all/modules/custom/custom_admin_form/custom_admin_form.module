@@ -1,0 +1,107 @@
+<?php
+
+/**
+ * @ file
+ * Custom admin config and form for user data.
+ */
+
+/**
+ * Implements hook_menu().
+ */
+function custom_admin_form_menu() {
+  $items['admin/config/custom'] = array(
+    'title' => 'Custom admin form',
+    'access arguments' => ['administer users'],
+  );
+
+  $items['admin/config/custom/form'] = array(
+    'title' => 'Custom admin form',
+    'description' => 'Click here for form',
+    'access arguments' => ['administer users'],
+    'page callback' => 'drupal_get_form',
+    'page arguments' => ['_custom_admin_form_callback'],
+  );
+  return $items;
+}
+
+function _custom_admin_form_callback($form, &$form_state) {
+  $form = [];
+  $form['name'] = [
+    '#title' => t('Name'),
+    '#type' => 'textfield',
+    '#required' => TRUE,
+    //'#default_value' => variable_get('name', ''),
+  ];
+
+  $form['email'] = [
+    '#title' => t('Email'),
+    '#type' => 'textfield',
+    '#required' => TRUE,
+  ];
+
+  return system_settings_form($form);
+}
+
+
+function _custom_admin_form_callback_validate($form, &$form_state) {
+   if (strlen($form_state['values']['name']) > 100) {
+     form_set_error('name', t('Please enter less then 100 character.'));
+   }
+
+   if (!preg_match('/^[A-Za-z\s]+$/', $form_state['values']['name'])) {
+     form_set_error('name', t('Please enter only alphabetical.'));
+   }
+
+   if (!valid_email_address($form_state['values']['email'])) {
+     form_set_error('eamil', t('Please enter valid email address.'));
+   }
+}
+
+/**
+ * Implements hook_block_info().
+ */
+function custom_admin_form_block_info() {
+  $blocks['custom_admin_form_block'] = array(
+    'info' => t('Custom form data by admin'),
+    'cache' => DRUPAL_NO_CACHE,
+    'weight' => 100,
+  );
+
+  return $blocks;
+}
+
+/**
+ * Implements hook_block_view().
+ */
+function custom_admin_form_block_view($delta = '') {
+  $block = array();
+  $datas = [
+    'var_name' => variable_get('name'),
+    'var_email' => variable_get('email'),
+  ];
+
+dsm($datas);
+
+  $header_table = [
+    ['data' => t('Name'), 'field' => 'name'],
+    ['data' => t('Email'), 'field' => 'email']
+  ];
+  foreach ($datas as $data) {
+    $rows[] = [
+      'name' => $datas['var_name'],
+      'eamil' => $datas['var_email'],
+    ];
+  }
+  $output = theme('table', ['header' => $header_table, 'rows' => $rows]);
+
+
+
+  switch ($delta) {
+    case 'custom_admin_form_block':
+      $block['subject'] = t('Custom form data by admin');
+      $block['content'] = $output;
+      break;
+  }
+
+  return $block;
+}

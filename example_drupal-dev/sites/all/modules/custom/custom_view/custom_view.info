@@ -1,0 +1,6 @@
+name = Custom view
+description = Create some custom function for view modules
+core = 7.x
+package = View Custom
+files[] = custom_view_handler_filter_field_count.inc
+scripts[] = js/custom_views_scroll.js

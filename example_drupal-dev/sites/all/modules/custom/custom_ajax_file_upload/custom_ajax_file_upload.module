@@ -1,0 +1,111 @@
+<?php
+
+/**
+ * Implements hook_init().
+ */
+function custom_ajax_file_upload_init() {
+//  drupal_add_js(drupal_get_path('module', 'custom_ajax_file_upload') . '/js/auto_submit.js');
+}
+
+/**
+ * Implements hook_menu().
+ */
+function custom_ajax_file_upload_menu() {
+
+   $items['custom_ajax_file_upload'] = array(
+    'title' => 'Create a/c and Custom ajax file upload',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('custom_ajax_file_upload_form'),
+    'access callback' => 'user_is_anonymous',
+  );
+
+  return $items;
+}
+
+
+function custom_ajax_file_upload_form($form, &$form_state) {
+
+$form = [];
+$form['user_picture'] = [
+  //'#title' => 'User Photo',
+  '#type' => 'managed_file',
+  //'#upload_location' => 'public://',
+  ];
+
+/*$form['submit'] = [
+   '#type' => 'submit',
+   '#value' => 'Save',
+ ];*/
+ $module_path = drupal_get_path('module', 'custom_ajax_file_upload');
+
+ if (!isset($form_state['values']['user_picture'])) {
+
+  $form['user_image'] = array(
+        '#prefix' => '<div id="user_image"><div id="display-user-profile">',
+        '#markup' => '<a href="#">
+                        <img src="'.$module_path . '/images/upload.png" height="150" width="150" /></a>',
+        '#suffix' => '</div></div>',
+    );
+}
+ $form['submit'] = [
+   '#type' => 'submit',
+   '#value' => 'Save',
+   '#ajax' => array(
+            'callback' => 'user_profile_image_submit',
+            'wrapper' => 'display-user-profile',
+        ),
+  ];
+
+  $form['#attached']['js'] = array(
+    drupal_get_path('module', 'custom_ajax_file_upload') . '/js/auto_submit.js',
+  );
+  $form['#attached']['css'] = array(
+    drupal_get_path('module', 'custom_ajax_file_upload') . '/css/auto_submit.css',
+  );
+
+  return $form;
+}
+
+function user_profile_image_submit($form, &$form_state) {
+global $base_url;
+$file = file_save_upload('user_picture', array('file_validate_extensions' => array('png gif jpg jpeg')), "public://", FILE_EXISTS_REPLACE);
+    if ($file) {
+        $file->status = FILE_STATUS_PERMANENT;
+        file_save($file);
+        $img = '<div id="display-user-profile"><a href="#"><img src="sites/default/files/'.$file->filename .'" height="150" width="150" /></a></div>';
+        $image['user_image']['#markup'] = $img;
+    } else {
+        drupal_set_message('No file uploaded.');
+    }
+
+    return $image['user_image'];
+}
+
+
+
+/**
+* Implements hook_theme().
+*/
+function custom_ajax_file_upload_theme() {
+  return array(
+    'custom_ajax_file_upload_form' => array(
+      'render element' => 'form',
+    ),
+  );
+}
+
+
+/**
+* Implements theme_mymodule_thumb_upload theme callback.
+*/
+function theme_custom_ajax_file_upload_form($variables) {
+  $form = $variables['form'];
+  $output = '';
+             $output .= ' <div class= "user_img" style="display:one;">
+             <div>' . drupal_render($form['user_picture']) . '</div>
+             <div>' . drupal_render($form['submit']) . '</div>
+             </div>';
+$output .= drupal_render_children($form);
+
+return  $output;
+ }

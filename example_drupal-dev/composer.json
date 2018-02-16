@@ -1,0 +1,5 @@
+{
+    "require": {
+        "drupal/admin_views": "^1.6"
+    }
+}

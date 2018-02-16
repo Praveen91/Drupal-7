@@ -1,0 +1,9 @@
+<?php
+
+/**
+ * Implements hook_init().
+ */
+function global_init() {
+  drupal_add_js(drupal_get_path('module', 'global') . '/hide_message.js', 'file');
+  drupal_add_js(array('global' => array('duration' => 10000)), array('type' => 'setting'));
+}

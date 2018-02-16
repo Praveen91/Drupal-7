@@ -1,0 +1,71 @@
+<?php
+
+
+function custom_ajax_menu() {
+  $items['custom-ajax-forms'] = array(
+    'title' => 'Custom Ajax Form with ajax validation ',
+    'description' => 'Custom Ajax form example',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('custom_ajax_form'),
+    'access callback' => TRUE,
+  );
+return $items;
+}
+/**
+  * Form implementation
+  */
+function custom_ajax_form($form, $form_state) {
+    $form = array();
+
+    $form['#prefix'] = '<div id="custom-ajax-form">'; //wrapper that will be replaced in ajax callback
+    $form['#suffix'] = '</div>';
+
+    $form['title'] = array(
+        '#type' => 'textfield',
+        '#title' => t('Title'),
+        '#required' => TRUE
+    );
+
+    $form['text'] = array(
+        '#type' => 'textfield',
+        '#title' => t('Some field'),
+        '#required' => TRUE
+    );
+
+    $form['submit'] = array(
+        '#type' => 'submit',
+        '#value' => t('Submit'),
+        '#ajax' => array(
+            'callback' => 'custom_ajax_callback',
+            'wrapper' => 'custom-ajax-form'
+        )
+    );
+
+    return $form;
+}
+
+// After this lets implement ajax callback function
+
+function custom_ajax_callback($form, $form_state) {
+    return $form; // returning form will refresh the complete form
+}
+
+
+/**
+  * Form validation
+  */
+function custom_ajax_form_validate($form, $form_state) {
+    //do the validations here
+}
+
+/**
+  * Form submit
+  */
+function custom_ajax_form_submit($form, &$form_state) {
+    drupal_set_message('<pre>' . print_r($form_state['values'], 1) . '</pre>');
+
+    //insert into database or you whatever is required
+
+    $form_state['input'] = array(); //remove user inputted values from form fields
+    $form_state['rebuild'] = TRUE; //rebuild form
+}

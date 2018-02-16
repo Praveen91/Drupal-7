@@ -1,0 +1,5 @@
+name = Multistep example
+description = "Example of using ctools multistep wizard"
+core = 7.x
+dependencies[] = ctools
+package = Custom

@@ -1,0 +1,73 @@
+<?php
+
+/**
+ * Implements hook_schema().
+ */
+function ajaxforms_schema() {
+  $schema['site_user'] = array(
+    'description' => 'Data retated to user login details only visbole by own user account.',
+    'fields' => array(
+      'id' => array(
+        'type' => 'serial',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'size' => 'big',
+       ),
+      'uid' => array(
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'default' => 0,
+      ),
+      'username' => array(
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => FALSE,
+        'default' => '',
+      ),
+      'password' => array(
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'default' => 0,
+       ),
+      ),
+      'indexes' => array(
+      'id' => array('id'),
+    ),
+    'primary key' => array('id'),
+  );
+  return $schema;
+}
+
+/**
+ * alter type password field to {site_user} table.
+ */
+function ajaxforms_update_7100() {
+  $spec = array(
+    'type' => 'varchar',
+    'description' => "Site User Password",
+    'length' => 255,
+    'not null' => FALSE,
+  );
+  db_change_field('site_user', 'password', 'password', $spec);
+}
+
+function ajaxforms_update_7101() {
+  $spec = array(
+    'type' => 'int',
+    'not null' => TRUE,
+    'default' => 0,
+  );
+ db_add_field('site_user', 'image_file', $spec);
+}
+
+
+function ajaxforms_update_7102() {
+  $spec = array(
+    'type' => 'int',
+    'not null' => TRUE,
+    'default' => 0,
+  );
+ db_add_field('site_user', 'image_file_manage', $spec);
+}

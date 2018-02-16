@@ -1,0 +1,223 @@
+<?php
+
+/**
+ * Implements hook_init();
+ */
+function ukuni_form_init(){
+    $path = drupal_get_path('module', 'ukuni_form');
+    drupal_add_js($path . '/js/ukuni_form.js');
+    drupal_add_library('system', 'ui.accordion');
+}
+
+
+
+/**
+ * Implements hook_menu().
+ */
+function ukuni_form_menu() {
+  $items['ukuni/form'] = array(
+    'title' => 'Ukuni Tutor Form',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('ukuni_custom_form'),
+    'access arguments' => array('access contnet'),
+  );
+
+  $items['accordion_form'] = array(
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('accordion_form'),
+    'access arguments' => array('access content'),
+    'type'=>MENU_CALLBACK,
+  );
+
+  return $items;
+}
+
+
+function ukuni_custom_form($form, &$form_state) {
+
+   $form = [];
+
+   $form['tutor_goal'] = [
+    '#title' => t('Select Goal'),
+    '#type' => 'select',
+    '#options' =>  [''=>'Select Goal', '1' => 'Goal one', '2' => 'Goal two', '3' => 'Goal three'],
+    '#ajax' => [
+       'callback' => 'ukuni_custom_form_callback',
+       'wrapper' => 'custom_fieldset',
+       'effect' => 'fade',
+    ],
+   ];
+
+
+
+  //print_r($opt_val);
+  $form["main-container"] = [
+     '#type' => 'container',
+     '#prefix' => '<div id="custom_fieldset">',
+     '#suffix' => '</div>',
+   ];
+
+
+
+
+  $opt_val = !empty($form_state['values']['tutor_goal']) ? $form_state['values']['tutor_goal'] : 1;
+
+  if (!empty($form_state['values']['tutor_goal']) && $form_state['values']['tutor_goal']) {
+
+    for ($i = 1; $i <= $opt_val; $i++) {
+     # code...
+
+   $form["main-container"]["container$i"] = [
+     '#title' => "Subject Container$i",
+     '#type' => 'fieldset',
+     '#prefix' => "<div id='custom_fieldset_$i'>",
+     '#suffix' => '</div>',
+     '#collapsible' => TRUE,
+     '#collapsed' => TRUE,
+   ];
+
+   $form["main-container"]["container$i"]["subject_level$i"] = [
+    '#type' => 'markup',
+    '#markup' => "Subject Levels$i",
+    '#prefix' => '<div class="subject-level">',
+    '#suffix' => '</div>',
+   ];
+
+   $form["main-container"]["container$i"]["subject_level_price$i"] = [
+    '#type' => 'textfield',
+    '#title' => "Price$i",
+    '#prefix' => '<div class="subject-level-price">',
+    '#suffix' => '</div>',
+    '#size' => '20',
+   ];
+
+
+
+   }
+$form["main-container"]['action']['submit'] = [
+   '#type' => 'submit',
+   '#value' => 'Save',
+    ];
+ }
+
+
+
+   return $form;
+
+
+}
+
+
+function ukuni_custom_form_submit($form, &$form_state) {
+ echo "<pre>";
+  print_r($form_state);
+
+  echo "string"; exit();
+}
+
+
+function ukuni_custom_form_callback($form, $form_state) {
+  $path = drupal_get_path('module', 'ukuni_form');
+    drupal_add_js($path . '/js/ukuni_form.js');
+  return $form["main-container"];
+}
+
+
+
+function accordion_form($form,&$form_state) {
+
+   global $user;
+
+
+  $form = array();
+
+  $form['student_header'] = array(
+    '#markup' => '<div class="student_header"><b>Student Form</b></div>',
+
+
+  );
+
+  $form['student_accordion'] = array(
+    '#prefix' => '<div id="accordion" >',
+
+  );
+
+$ques_arr = array(
+    '1' => "What is your name?",
+    '2' => "How old are you?",
+    '3' => "InWhich class do you read?",
+);
+
+//Query into your database table and replace above array. I created this array for demo only.
+
+foreach($ques_arr as $key=>$val){
+    $form['student_question-'.$key] = array(
+    '#markup' => '<h3><b>'.$val.'</b></h3>',
+
+  );
+
+  $form['student_answer-'.$key] = array(
+
+         '#type' => 'text_format',
+        '#resizable' => FALSE,
+        '#default_value' => '',
+
+
+
+  );
+}
+
+
+  $form['student_accordion_close'] = array(
+    '#suffix' => '</div>',
+
+  );
+
+
+
+  $form['submit_one'] = array(
+    '#value' => "Save",
+    '#type' => 'submit',
+     '#ajax' => array(
+      'callback' => "show_save_msg",
+      'wrapper' => "replace_ajax_div",
+
+    ),
+    '#submit' => array('student_answer_submit'),
+    );
+
+
+
+
+  $form['workbook_ajax_form'] = array(
+      '#type' => 'item',
+    '#markup' => '<div id="replace_ajax_div"></div>',
+
+  );
+
+    return $form;
+}
+
+function student_answer_submit($form,&$form_state){
+
+//Save your values into Database here................
+   print_r($form_state['values']);
+}
+
+
+/**
+ * Implements hook_form_alter().
+ * @see http://drupal.org/node/1079826 for more information on this code.
+ */
+function ukuni_form_form_alter(&$form, $form_state, $form_id) {
+
+if ($form_id == 'views_exposed_form' && $form_state['view']->name == 'article_filter') {
+    $form['field_tags_tid'] = array(
+    '#type' => 'autocomplete_deluxe',
+    '#autocomplete_deluxe_path' => url('autocomplete_deluxe/taxonomy/field_tags', array('absolute' => TRUE)),
+    '#multiple' => TRUE,
+    '#autocomplete_min_length' => 0,
+    '#autocomplete_multiple_delimiter' => ',',
+    );
+   }
+}

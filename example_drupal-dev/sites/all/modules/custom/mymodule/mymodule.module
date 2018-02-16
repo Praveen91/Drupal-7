@@ -1,0 +1,8 @@
+<?php
+
+
+function mymodule_views_api() {
+	return [
+      'api' => 3
+	];
+}

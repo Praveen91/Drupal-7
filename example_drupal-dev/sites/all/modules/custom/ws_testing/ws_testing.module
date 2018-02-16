@@ -1,0 +1,77 @@
+<?php
+
+/**
+ * Implements hook_block_info().
+ */
+function ws_testing_block_info() {
+
+   $blocks['ws_testing'] = array(
+    'info' => t('Web Service'),
+    'cache' => DRUPAL_NO_CACHE
+  );
+
+  return $blocks;
+}
+
+/**
+ * Implements hook_block_view().
+ */
+function ws_testing_block_view($delta = '') {
+  $block = array();
+
+  switch ($delta) {
+    case 'ws_testing':
+      $block['subject'] = t('Web service list of content coming from other site');
+
+
+      $get_node_result = ws_testing_get_node_from_other();
+
+  //    dpm($get_node_result);
+
+      $data = json_decode($get_node_result->data);
+
+//dpm($data);
+      foreach ($data as $key => $value) {
+      	$items[] = l($value->title, 'http://dev-drupop.pantheonsite.io/node/' . $value->nid, array('attributes' => array('class' => 'node-link', 'target' => '_blank')));
+      }
+      $title = t('LIST OF NODE');
+      $type = 'ul';
+      $attributes = array(
+        'id' => 'my-custom-listing',
+        'class' => 'custom-class another-custom-class', // a string or indexed (string) array with the classes for the list tag
+      );
+
+      $list = theme('item_list', array('items' => $items, 'title' => $title, 'type' => $type, 'attributes' => $attributes));
+
+      $block['content'] = array(
+      	'#markup' =>  $list
+      	);
+
+      //dpm($data);
+
+      break;
+
+  }
+  return $block;
+}
+
+/**
+ * Helper function for get node list from url api.
+ */
+function ws_testing_get_node_from_other() {
+	$url = 'http://dev-drupop.pantheonsite.io/drupal_api_pop/node/';
+    return drupal_http_request($url);
+}
+
+
+
+/*function ws_testing_block_view_alter(&$data, $block) {
+  	if($block->module == 'ws_testing' && $block->status == '1') {
+  	//$data['content']['#markup'] = '<h6>Test</h6>';
+  	//kpr($data['content']['#markup']);
+   }
+}*/
+
+
+
+

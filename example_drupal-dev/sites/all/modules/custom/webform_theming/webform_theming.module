@@ -1,0 +1,18 @@
+<?php
+
+/**
+ * Implements HOOK_form_webform_client_form_NID_alter().
+ */
+function webform_theming_form_webform_client_form_156_alter(&$form, &$form_state, $form_id) {
+  // Change the First Name field title.
+
+  //$form['submitted']['first_name']['#title'] = t('Tell me your first name');
+
+  // Add an icon to the email form field.
+  $form['submitted']['email']['#field_prefix'] = '<i class="glyphicon glyphicon-envelope"></i>';
+  // Add the following to the YOURTHEME_form_webform_client_form_1_alter() function.
+// Add css and js to the form.
+  $form['#attached']['css'][] = drupal_get_path('module', 'webform_theming') . '/css/webform_156.css';
+  $form['#attached']['js'][] = drupal_get_path('module', 'webform_theming') . '/js/webform_156.js';
+
+}

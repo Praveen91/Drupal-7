@@ -1,0 +1,112 @@
+<?php
+
+/*
+ * Implements hook_menu().
+ */
+function demo_menu() {
+  $items = array();
+  $items['admin/config/people/passwords'] = array(
+    'title' => 'Bad Passwords Lists',
+    'description' => t('Configure a list of passwords that are not allowed.'),
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('demo_passwords_form'),
+    'access arguments' => array('administer site configuration'),
+    'file' => 'demo_passwords_form.inc',
+  ); 
+  return $items; 
+}
+
+
+/*
+ * Implements hook_form_alter().
+ */
+function demo_form_alter(&$form, &$form_state, $form_id) {
+  #krumo($form_id);
+  switch ($form_id) {
+    case 'user_profile_form' :
+      
+      $form['account']['pass']['#description'] = t('To change the current user password, enter the new password in both fields. Please do not use common passwords like "password", "12345", "love".');
+      $form['#validate'][] = 'demo_validate_password';
+
+      #krumo($form);
+
+    break;
+    
+    case 'pack_node_form' :
+   //dpm($form);
+    $form['field_goal'] = [
+    '#title' => t('Select Goal'),
+    '#type' => 'select',
+    '#options' => $form['field_goal']['und']['#options'],  
+    '#ajax' => [
+       'callback' => '_get_subject_via_goal',
+       'wrapper' => 'subject-choices',
+      ],
+    ];
+    
+    if (isset($form_state['values']['field_goal'])) {
+         $options = $form['field_subject']['#options'];
+    } else {
+         $options = ['' => 'Select Subject'];
+     }
+
+    $form['field_subject'] = [
+    '#title' => t('Select Subjects'),
+    '#type' => 'select',
+    '#options' => $options,
+    '#prefix' => '<div id="subject-choices">',
+    '#suffix' => '</div>',
+    ];
+    
+    
+    break;
+  }
+}
+
+function _get_subject_via_goal($form, &$form_state) {
+   
+    $goal_id = $form_state['values']['field_goal'];
+    $goal_name = 'subject';
+    $goal_vid = taxonomy_vocabulary_machine_name_load($goal_name);
+    
+    //$tst = taxonomy_term_load_multiple($goal_vid->vid);
+    
+    $terms =  entity_load('taxonomy_term', FALSE , array('vid' => $goal_vid->vid));
+
+    foreach ($terms as $key => $term) {
+        $options[$key] = $term->name;
+     } 
+
+   $form['field_subject']['#options'] = $options;
+   return $form['field_subject']['#options'];
+}
+
+
+/*
+ * Implement hook_form_FORM_ID_alter().
+ */
+function demo_form_user_register_form_alter(&$form, &$form_state, $form_id) {
+
+  $form['account']['pass']['#description'] = t('To change the current user password, enter the new password in both fields. Please do not use common passwords like "password", "12345", "love".');
+  $form['#validate'][] = 'demo_validate_password';
+  #krumo($form);
+}
+
+
+/*
+ * Custom password validation
+ */
+function demo_validate_password($form, &$form_state) {
+  //$badpasswords = array('password', '12345', 'love');
+  $badpasswords = variable_get('demo_badpasswords');
+  $badpasswords_array = explode(', ', $badpasswords);
+  #krumo($badpasswords_array);
+
+  if (in_array($form_state['values']['pass'],  $badpasswords_array)) {
+    form_set_error('pass', t('Please use a more secure password.'));
+  }
+
+  #krumo($form_state);
+}
+
+

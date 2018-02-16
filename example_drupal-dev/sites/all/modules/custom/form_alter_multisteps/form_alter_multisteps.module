@@ -1,0 +1,303 @@
+<?php
+
+/**
+ * @file
+ * Customizations to the Drupal registration system.
+ */
+/**
+ * Returns the list of steps and their associated forms.
+ */
+function _campusmate_signup_steps() {
+  return array(
+    1 => array(
+      'form' => 'campusmate_signup_profile_info',
+    ),
+    2 => array(
+      'form' => 'campusmate_signup_personal_info',
+    ),
+    3 => array(
+      'form' => 'campusmate_signup_subject_info',
+    ),
+  );
+}
+
+/**
+ * Implements hook_form_FORM_ID_alter().
+ */
+function form_alter_multisteps_form_user_register_form_alter(&$form, &$form_state) {
+// Make this a multi-step form.
+
+  global $user;
+  if (!path_is_admin(current_path())) {
+
+    if (empty($form_state['step'])) {
+      $form_state['step'] = 1;
+      $form_state['step_information'] = _campusmate_signup_steps();
+    }
+      // Set the step.
+    $form['step-info'] = array(
+      '#markup' => '<h1> '.t('Sign up ') . $form_state['step'] .'/3 </h1>',
+      '#weight' => -10,
+    );
+
+    if ($form_state['step'] == 1) {
+     $steps_desc = 'Which from this list are you?';
+   }
+   elseif ($form_state['step'] == 2) {
+     $steps_desc = 'Let us know you better!';
+   }
+   else {
+     $steps_desc = 'Now check your subjects of interest:';
+   }
+      // Add text for step
+   $form['step-desc'] = array(
+    '#markup' => '<h3>' . t($steps_desc) . '</h3>',
+    '#weight' => -10,
+  );
+
+   if (!empty($form_state['step']) && $form_state['step'] == 2) {
+    campusmate_signup_personal_info($form, $form_state);
+  }
+  elseif (!empty($form_state['step']) && $form_state['step'] == 3) {
+    campusmate_signup_subject_info($form, $form_state);
+  } else {
+      // Otherwise we build setp one.
+    campusmate_signup_profile_info($form, $form_state);
+  }
+}
+}
+
+/**
+ * Step one of user profile info.
+ */
+function campusmate_signup_profile_info(&$form, &$form_state) {
+
+   // Set default values (so they validate).
+  $form['field_user_profile']['und']['#default_value'] = !empty($form_state['values']['field_user_profile']['und']['0']['value']) ? $form_state['values']['field_user_profile']['und']['0']['value'] : '';
+  // Hide the information for step 2.
+  $form['account']['#access'] = FALSE;
+  $form['field_user_phone']['#access'] = FALSE;
+  $form['field_full_name']['#access'] = FALSE;
+  // Stop validation.
+  unset($form['account']['pass']);
+  unset($form['#validate']);
+
+  // Add a next button.
+  $form['actions']['next'] = array(
+    '#type' => 'submit',
+    '#value' => 'Next >>',
+    '#submit' => array('campusmate_signup_next_submit'),
+  );
+
+  // Remove the 'Create new account' button from step 1.
+  unset($form['actions']['submit']);
+
+}
+
+/**
+ * Step two of user Personal info.
+ */
+function campusmate_signup_personal_info(&$form, &$form_state) {
+
+   // Hide the information for step 1.
+  $form['field_user_profile']['#access'] = FALSE;
+
+  // Add a back button.
+  $form['actions']['back'] = array(
+    '#type' => 'submit',
+    '#value' => t('<< Back'),
+    '#submit' => array('campusmate_signup_back_submit'),
+    '#limit_validation_errors' => array(),
+  );
+
+// Set default values (so they validate).
+  $form['account']['mail']['#default_value'] = !empty($form_state['values']['mail']) ? $form_state['values']['mail'] : '';
+
+  $form['field_full_name']['und']['0']['value']['#default_value'] = !empty($form_state['values']['field_full_name']['und']['0']['value']) ? $form_state['values']['field_full_name']['und']['0']['value'] : '';
+
+  $form['field_user_phone']['und']['0']['value']['#default_value'] = !empty($form_state['values']['field_user_phone']['und']['0']['value']) ? $form_state['values']['field_user_phone']['und']['0']['value'] : '';
+   // Add a next button.
+  $form['actions']['next'] = array(
+    '#type' => 'submit',
+    '#value' => 'Next >>',
+    '#submit' => array('campusmate_signup_next_submit'),
+  );
+
+ /* $form['user_photo'] = [
+   '#type' => 'managed_file',
+   '#title' => 'User Photo',
+   '#upload_location' => 'public://',
+   /*'#ajax' => [
+     'callback' => 'user_photo_callback',
+     'wrapper' => 'user_photo_wrapper',
+    ],*/
+
+//  ];
+
+  // Adjust the submit button to come last.
+  $form['actions']['submit']['#weight'] = 100;
+
+   $form['picture']['#weight'] = -1;
+   $form['picture']['#access'] = TRUE;
+  // Add our own validation handler.
+
+kpr($form);
+   // Remove the 'Create new account' button from step 1.
+  unset($form['actions']['submit']);
+
+}
+
+function user_photo_callback($form, &$form_state) {
+// return $form['user_photo_markup'];
+}
+/**
+ * Step three of user Subject info.
+ */
+function campusmate_signup_subject_info(&$form, &$form_state) {
+kpr($form_state);
+  $form['actions']['back'] = array(
+    '#type' => 'submit',
+    '#value' => t('<< Back'),
+    '#submit' => array('campusmate_signup_back_submit'),
+    '#limit_validation_errors' => array(),
+  );
+ // Adjust the submit button to come last.
+  $form['actions']['submit']['#weight'] = 100;
+  // Hide the information for step 2.
+  $form['account']['#access'] = FALSE;
+  $form['field_user_phone']['#access'] = FALSE;
+  $form['field_full_name']['#access'] = FALSE;
+  $form['field_user_profile']['#access'] = FALSE;
+
+  $form['subject_name'] = [
+   '#type' => 'textfield',
+   '#title' => t('Name'),
+  ];
+
+  // Stop validation.
+  unset($form['account']['pass']);
+  unset($form['#validate']);
+
+  // Add an additional submit handler to the whole form.
+  $form['actions']['submit']['#validate'] = array('campusmate_signup_validate');
+  $form['#submit'][] = 'campusmate_signup_submit';
+  //array_unshift($form['#submit'], 'campusmate_signup_submit');
+
+}
+
+/**
+ * Validate handler.
+ */
+function campusmate_signup_validate($form, &$form_state) {
+
+foreach ($form_state['step_information'] as $key => $value) {
+   $value['stored_values']['signature'] = [
+     'value' => '',
+     'format' => 'filtered_html',
+   ];
+   if (!empty($value['stored_values']['mail'])) {
+     $form_state['values']['mail'] = $value['stored_values']['mail'];
+   }
+
+   if (!empty($value['stored_values']['pass'])) {
+     $form_state['values']['pass'] = $value['stored_values']['pass'];
+   }
+
+   if (!empty($value['stored_values']['field_user_profile']['und']['0']['value'])) {
+     $form_state['values']['field_user_profile']['und']['0']['value'] = $value['stored_values']['field_user_profile']['und']['0']['value'];
+   }
+   if (!empty($value['stored_values']['field_full_name']['und']['0']['value'])) {
+     $form_state['values']['field_full_name']['und']['0']['value'] = $value['stored_values']['field_full_name']['und']['0']['value'];
+   }
+
+   if (!empty($value['stored_values']['field_user_phone']['und']['0']['value'])) {
+     $form_state['values']['field_user_phone']['und']['0']['value'] = $value['stored_values']['field_user_phone']['und']['0']['value'];
+   }
+/*
+   if (!empty($value['stored_values']['user_photo']->fid)) {
+    $form_state['values']['picture_upload'] =  (Object) $value['stored_values']['user_photo'];
+  }*/
+
+   if (!empty($value['stored_values']['picture_upload']->fid)) {
+    $form_state['values']['picture_upload'] =  (Object) $value['stored_values']['picture_upload'];
+  }
+}
+  kpr($form_state['values']); //exit();
+
+}
+/**
+ * Submit handler for user registration form.
+ *
+ * Namespace collision demands underscore.
+ */
+function campusmate_signup_submit($form, &$form_state) {
+
+global $user;
+
+kpr($user);
+//exit();
+}
+
+/**
+ * Submit handler for next button.
+ *
+ * Capture the values from page one and store them away so they can be used
+ * at final submit time.
+ */
+function campusmate_signup_next_submit($form, &$form_state) {
+  $current_step = &$form_state['step'];
+
+  $form_state['step_information'][$current_step]['stored_values'] = $form_state['values'];
+  if ($current_step < count($form_state['step_information'])) {
+    $current_step++;
+    if (!empty($form_state['step_information'][$current_step]['stored_values'])) {
+      $form_state['values'] = $form_state['step_information'][$current_step]['stored_values'];
+    }
+    else {
+      $form_state['values'] = array();
+    }
+    // Force rebuild with next step.
+    $form_state['rebuild'] = TRUE;
+   // return;
+  }
+
+}
+
+/**
+ * Submit handler for the Back button.
+ */
+function campusmate_signup_back_submit($form, &$form_state) {
+  $current_step = &$form_state['step'];
+  $form_state['step_information'][$current_step]['stored_values'] = $form_state['input'];
+  if ($current_step > 1) {
+    $current_step--;
+    $form_state['values'] = $form_state['step_information'][$current_step]['stored_values'];
+  }
+  $form_state['rebuild'] = TRUE;
+}
+
+
+ /**
+ * Implements hook_theme().
+ */
+function form_alter_multisteps_theme($existing, $type, $theme, $path) {
+
+  $items['user_register_form'] = array(
+     'render element' => 'form',
+     'template' => 'user-register-steps',
+     'path' => drupal_get_path('module', 'form_alter_multisteps') .'/template', );
+
+  return $items;
+}
+
+
+/**
+ * Implements hook_menu_local_tasks_alter().
+ */
+function form_alter_multisteps_menu_local_tasks_alter(&$data, $router_item, $root_path) {
+  if($router_item['path'] == 'user/register' && $root_path == 'user/register') {
+    unset($data['tabs'][0]['output'][0]);
+    unset($data['tabs'][0]['output'][1]);
+    unset($data['tabs'][0]['output'][2]);
+  }
+}

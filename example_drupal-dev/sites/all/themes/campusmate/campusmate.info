@@ -1,0 +1,53 @@
+name = CampusMate
+description = CampusMatea platform connecting international students with the best local tutors, providing study abroad and work abroad related coaching, advice and tuition.
+core = 7.x
+package = Custom
+
+; STYLESHEETS
+;-------------------------------------------------------------------------------
+stylesheets[all][] = css/layout.css
+stylesheets[all][] = css/style.css
+
+; SCRIPTS
+;-------------------------------------------------------------------------------
+scripts[] = js/custom.js
+
+; REGIONS
+;-------------------------------------------------------------------------------
+regions[header] = Header
+regions[help] = Help
+regions[page_top] = Page top
+regions[page_bottom] = Page bottom
+regions[highlighted] = Highlighted
+
+regions[featured] = Featured
+regions[content] = Content
+regions[sidebar_first] = Sidebar first
+regions[sidebar_second] = Sidebar second
+
+regions[triptych_first] = Triptych first
+regions[triptych_middle] = Triptych middle
+regions[triptych_last] = Triptych last
+
+regions[footer_firstcolumn] = Footer first column
+regions[footer_secondcolumn] = Footer second column
+regions[footer_thirdcolumn] = Footer third column
+regions[footer_fourthcolumn] = Footer fourth column
+regions[footer] = Footer
+
+
+settings[banner_head] = Online Tutors for Studying Abroad
+settings[banner_desc] = Achieve your goals with expert advice
+settings[banner_label] = Start Now
+settings[banner_url] = packs
+
+settings[work_title] = How it works
+
+settings[how_it_work_1] = Find a Tutor
+settings[work_desc_1] = Compare tutors by price, background and reviews from other students
+
+settings[how_it_work_2] = Book a Pack
+settings[work_desc_2] = Select one of the packs of lessons that your tutor offers
+
+settings[how_it_work_3] = Schedule a Lesson
+settings[work_desc_3] = Choose from the calendar or message the tutor to suggest a time

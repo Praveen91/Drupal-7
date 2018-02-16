@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<module type="WEB_MODULE" version="4">
+  <component name="NewModuleRootManager">
+    <content url="file://$MODULE_DIR$" />
+    <orderEntry type="inheritedJdk" />
+    <orderEntry type="sourceFolder" forTests="false" />
+    <orderEntry type="module-library">
+      <library name="PHP" type="php">
+        <CLASSES>
+          <root url="file://$MODULE_DIR$/../../../../../includes" />
+          <root url="file://$MODULE_DIR$/../../../../../modules" />
+          <root url="file://$MODULE_DIR$/../../contrib" />
+          <root url="file://$MODULE_DIR$/../ajaxforms" />
+          <root url="file://$MODULE_DIR$/../angularjs_example" />
+          <root url="file://$MODULE_DIR$/../custom_admin_form" />
+          <root url="file://$MODULE_DIR$/../custom_ajax" />
+          <root url="file://$MODULE_DIR$/../custom_form" />
+          <root url="file://$MODULE_DIR$/../custom_hookapi" />
+          <root url="file://$MODULE_DIR$/../custom_view_mode" />
+          <root url="file://$MODULE_DIR$/../customform" />
+          <root url="file://$MODULE_DIR$/../d7-registration" />
+          <root url="file://$MODULE_DIR$/../demo" />
+          <root url="file://$MODULE_DIR$/../dynamic_theme" />
+          <root url="file://$MODULE_DIR$/../lotus" />
+          <root url="file://$MODULE_DIR$/../merc_global" />
+          <root url="file://$MODULE_DIR$/../modal_example" />
+          <root url="file://$MODULE_DIR$/../multi_example" />
+          <root url="file://$MODULE_DIR$/../mymodule" />
+          <root url="file://$MODULE_DIR$/../ukuni_form" />
+          <root url="file://$MODULE_DIR$/../videoentity" />
+          <root url="file://$MODULE_DIR$/../webform_theming" />
+          <root url="file://$MODULE_DIR$/../windfarms" />
+          <root url="file://$MODULE_DIR$/../ws_testing" />
+        </CLASSES>
+        <SOURCES>
+          <root url="file://$MODULE_DIR$/../../../../../includes" />
+          <root url="file://$MODULE_DIR$/../../../../../modules" />
+          <root url="file://$MODULE_DIR$/../../contrib" />
+          <root url="file://$MODULE_DIR$/../ajaxforms" />
+          <root url="file://$MODULE_DIR$/../angularjs_example" />
+          <root url="file://$MODULE_DIR$/../custom_admin_form" />
+          <root url="file://$MODULE_DIR$/../custom_ajax" />
+          <root url="file://$MODULE_DIR$/../custom_form" />
+          <root url="file://$MODULE_DIR$/../custom_hookapi" />
+          <root url="file://$MODULE_DIR$/../custom_view_mode" />
+          <root url="file://$MODULE_DIR$/../customform" />
+          <root url="file://$MODULE_DIR$/../d7-registration" />
+          <root url="file://$MODULE_DIR$/../demo" />
+          <root url="file://$MODULE_DIR$/../dynamic_theme" />
+          <root url="file://$MODULE_DIR$/../lotus" />
+          <root url="file://$MODULE_DIR$/../merc_global" />
+          <root url="file://$MODULE_DIR$/../modal_example" />
+          <root url="file://$MODULE_DIR$/../multi_example" />
+          <root url="file://$MODULE_DIR$/../mymodule" />
+          <root url="file://$MODULE_DIR$/../ukuni_form" />
+          <root url="file://$MODULE_DIR$/../videoentity" />
+          <root url="file://$MODULE_DIR$/../webform_theming" />
+          <root url="file://$MODULE_DIR$/../windfarms" />
+          <root url="file://$MODULE_DIR$/../ws_testing" />
+        </SOURCES>
+      </library>
+    </orderEntry>
+  </component>
+</module>

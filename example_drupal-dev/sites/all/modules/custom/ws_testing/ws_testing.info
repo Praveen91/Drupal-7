@@ -1,0 +1,4 @@
+name = Web Service Example
+description = An example how drupal web service work
+core = 7.x
+package = Custom

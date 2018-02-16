@@ -1,0 +1,24 @@
+<?php
+/**
+* @file
+* A description of what your module does.
+*/
+
+/**
+ * Implements hook_user_login().
+ */
+function my_module_user_login(&$edit, $account) {
+
+}
+
+/**
+ * Implements hook_user_logout().
+ */
+function my_module_user_logout($account) {
+  global $user;
+  if ($account) {
+    drupal_set_message('Welcome to site');
+  }
+}
+
+

@@ -1,0 +1,41 @@
+<?php
+
+/**
+ * Implements hook_menu().
+ */
+function angularjs_example_menu() {
+  
+  $items['camps'] = array(
+    'title' => 'All Aricles',
+    'page callback' => 'angularjs_example_camps_page',
+    'access arguments' => array('access content'),
+  );
+
+  return $items;
+}
+
+/**
+ * Implements hook_theme().
+ */
+function angularjs_example_theme($existing, $type, $theme, $path) {
+  return array(
+      'sd_camps' => array(
+        	'template' => 'sd-camps',
+      	),
+    );
+}
+
+
+/**
+ * page callback: sd_reports_camps_page()
+ * 
+ * @see sd_reports_menu()
+ */
+
+function angularjs_example_camps_page() {
+	  drupal_add_library('angularjs', 'angularjs');
+	  $path = drupal_get_path('module', 'angularjs_example');
+	  drupal_add_js($path. '/sdcamp.js');
+    
+    return theme('sd_camps');	  
+}

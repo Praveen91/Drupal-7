@@ -1,0 +1,268 @@
+@import url(https://fonts.googleapis.com/css?family=Raleway:300,400,700,800);
+@import url(https://fonts.googleapis.com/css?family=Roboto:300,400,900);
+
+article, aside, details, figcaption, figure, footer, header, hgroup, main, nav, section, summary {display: block;}
+.container {width: 94%; padding-right: 15px; padding-left: 15px; margin-right: auto; margin-left: auto;}
+.row {margin-right: -15px; margin-left: -15px;}
+.fullwidth{width:100%; float:left;}
+.small-box{width:80px; height:80px;}
+.mb8{margin-bottom:8px;}
+.mt8{margin-top:8px;}
+.mr8{margin-right:8px;}
+.ml8{margin-left:8px;}
+.mb16{margin-bottom:16px;}
+.mt16{margin-top:16px;}
+.mr16{margin-right:16px;}
+.ml16{margin-left:16px;}
+.mt32{margin-top:32px;}
+.mr32{margin-right:32px;}
+.mb32{margin-bottom:32px;}
+.ml32{margin-left:32px;}
+.mt64{margin-top:64px;}
+.mr64{margin-right:64px;}
+.mb64{margin-bottom:64px;}
+.ml64{margin-left:64px;}
+.mt96{margin-top:64px;}
+.mr96{margin-right:64px;}
+.mb96{margin-bottom:64px;}
+.ml96{margin-left:64px;}
+.mt128{margin-top:128px;}
+.mr128{margin-right:128px;}
+.mb128{margin-bottom:128px;}
+.ml128{margin-left:128px;}
+.left{float:left;}
+.right{float:right!important;}
+.clearfix{clear:both;}
+.g-f-color1{color:#878787;}
+blockquote{font-family: 'Roboto', sans-serif; font-weight: 300;}
+.pt32{padding-top:32px;}
+.pl32{padding-left:32px;}
+.pb32{padding-bottom:32px;}
+.pr32{padding-right:32px;}
+.pt64{padding-top:64px;}
+.pl64{padding-left:64px;}
+.pb64{padding-bottom:64px;}
+.pr64{padding-right:64px;}
+.text-center{text-align:center;}
+.textfield{border-radius: 30px; -webkit-border-radius: 30px; border:none; font-family: 'Roboto', sans-serif; font-weight: 400; font-size:12px; color:#888888; padding:8px 16px;}
+.textfield-full{border-radius: 30px; -webkit-border-radius: 30px; border:none; font-family: 'Roboto', sans-serif; font-weight: 400; font-size:14px; color:#888888; padding:16px 32px; width:83%;}
+hr{margin-top:30px; margin-bottom:30px; clear: both; border-top: solid 1px #d1d1d1; border-bottom: none; border-left: none; border-right: none; overflow: hidden; float:left; width:100%;}
+img, video { max-width: 100%; height: auto;}
+.margin-auto{margin:0 auto!important; float: none !important;}
+a{text-decoration:none; color:#21d1b0;}
+.inline-block{display:inline-block;}
+/*.subject-tab{display: flex;}
+.subject-tab-box{flex:1;}*/
+.subject-icon{width:75px;}
+.subject-icon-big{width:100px;}
+
+
+/*=====FONT COLORS CSS START HERE=====*/
+
+.FontGreen1{color:#21D1B0;}
+.FontGreen2{color:#199D84;}
+.FontGreen3{color:#D3F6EF;}
+.FontGreen4{color:#A6EDDF;}
+
+.FontBlue1{color:#30305E;}
+.FontBlue2{color:#59597E;}
+.FontBlue3{color:#83839E;}
+.FontBlue4{color:#ACACBF;}
+
+.FontGrey1{color:#282828;}
+.FontGrey2{color:#888888;}
+.FontGrey3{color:#CCCCCC;}
+.FontGrey4{color:#F3F3F3;}
+
+/*=====FONT COLORS CSS END HERE=====*/
+
+
+
+/*=====COLORS CSS START HERE=====*/
+
+.CMGreen1{background:#21D1B0;}
+.CMGreen2{background:#199D84;}
+.CMGreen3{background:#D3F6EF;}
+.CMGreen4{background:#A6EDDF;}
+
+.CMBlue1{background:#30305E;}
+.CMBlue2{background:#59597E;}
+.CMBlue3{background:#83839E;}
+.CMBlue4{background:#ACACBF;}
+
+.CMGrey1{background:#282828;}
+.CMGrey2{background:#888888;}
+.CMGrey3{background:#CCCCCC;}
+.CMGrey4{background:#F3F3F3;}
+
+/*=====COLORS CSS END HERE=====*/
+
+
+/*=====FONT FAMILY CSS START HERE=====*/
+
+
+.FontFamily1{font-family: 'Raleway', sans-serif;}
+.FontFamily1-Light{font-weight: 300;}
+.FontFamily1-Regular{font-weight: 400;}
+.FontFamily1-Bold{font-weight: 800;}
+.FontFamily1-ExtraBold{font-weight: 900;}
+
+.FontFamily2{font-family: 'Roboto', sans-serif;}
+.FontFamily2-Light{font-weight: 300;}
+.FontFamily2-Regular{font-weight: 400;}
+.FontFamily2-Black{font-weight: 900;}
+
+/*=====FONT FAMILY CSS END HERE=====*/
+
+
+/*=====FONT SIZE CSS START HERE=====*/
+
+
+.f-00{font-size:48px; line-height:72px;}
+.f-0{font-size:40px; line-height:60px;}
+.f-1{font-size:32px; line-height:48px;}
+.f-2{font-size:24px; line-height:36px;}
+.f-3{font-size:20px; line-height:30px;}
+.f-4{font-size:16px; line-height:24px;}
+.f-5{font-size:14px; line-height:21px;}
+.f-6{font-size:12px; line-height:18px;}
+.f-7{font-size:10px; line-height:14px;}
+.f-22{font-size:22px; line-height:30px;}
+.f-18{font-size:18px; line-height:25px;}
+.f-26{font-size:26px; line-height:40px;}
+
+
+/*=====FONT SIZE CSS END HERE=====*/
+
+
+/*=====LETTER SPACING CSS START HERE=====*/
+
+
+.LetterSpacing1px{letter-spacing:1px;}
+.LetterSpacing0.5px{letter-spacing:0.5px;}
+
+/*=====LETTER SPACING CSS END HERE=====*/
+
+/*=====BUTTONS CSS START HERE=====*/
+
+.CTAGhost-b1{border:solid 1px #ababbf; color:#ababbf;}
+.CTAGhost-b2{border:solid 1px #30305e; color:#30305e;}
+.CTAGhost-b3{border:solid 1px #a6edde; color:#a6edde;}
+.CTAGhost-b4{border:solid 1px #21d1b0; color:#21d1b0;}
+.CTAGhost-b5{border:solid 1px #ffffff; color:#ffffff;}
+
+.CTAGhost-Elarge{border-radius: 30px; -webkit-border-radius: 30px; cursor:pointer; background:transparent; text-transform:uppercase; padding:17px 64px 16px 64px; font-family: 'Raleway', sans-serif; font-size:14px; font-weight: 800; letter-spacing:1px;}
+.CTAGhost-Large{border-radius: 30px; -webkit-border-radius: 30px; cursor:pointer; background:transparent; text-transform:uppercase; padding:14px 32px; font-family: 'Raleway', sans-serif; font-size:12px; font-weight: 800; letter-spacing:1px;}
+.CTAGhost-Small{border-radius: 30px; -webkit-border-radius: 30px; cursor:pointer; background:#ffffff; text-transform:uppercase; padding:12px 16px; font-family: 'Raleway', sans-serif; font-size:10px; font-weight: 800; letter-spacing:1px;}
+.CTAGhost-ESmall{border-radius: 30px; -webkit-border-radius: 30px; cursor:pointer; background:#ffffff; text-transform:uppercase; padding:6px 12px; font-family: 'Raleway', sans-serif; font-size:10px; font-weight: 800; letter-spacing:1px;}
+
+.CTA-b1{border:solid 1px #ababbf; background:#ababbf; color:#fff;}
+.CTA-b2{border:solid 1px #30305e; background:#30305e; color:#fff;}
+.CTA-b3{border:solid 1px #a6edde; background:#a6edde; color:#fff;}
+.CTA-b4{border:solid 1px #21d1b0; background:#21d1b0; color:#fff;}
+
+/*=====BUTTONS CSS START HERE=====*/
+
+
+/*=====COLUMN CSS START HERE=====*/
+
+
+.col-md-12 {width: 100%; float: left;}
+.col-md-11 {width: 91.66666667%; float: left;}
+.col-md-10 {width: 83.33333333%; float: left;}
+.col-md-9 {width: 75%; float: left;}
+.col-md-8 {width: 66.66666667%; float: left;}
+.col-md-7 {width: 58.33333333%; float: left;}
+.col-md-6 {width: 50%; float: left;}
+.col-md-5 {width: 41.66666667%; float: left;}
+.col-md-4 {width: 33.33333333%; float: left;}
+.col-md-3 {width: 25%; float: left;}
+.col-md-2 {width: 16.66666667%; float: left;}
+.col-md-1 {width: 8.33333333%; float: left;}
+
+/*=====COLUMN CSS END HERE=====*/
+
+
+
+/*=====CUSTOM SELECT MENU CSS START HERE=====*/
+
+.select-hidden {display: none; visibility: hidden; padding-right: 10px;}
+.select {cursor: pointer; display: inline-block; position: relative; line-height:30px; font-family: 'robotobold'; font-size: 16px; color: #000000; text-align:left; width: 70%; height: 45px;}
+.select-styled {font-family: 'Roboto', sans-serif; font-size:14px; font-weight: bold; color:#cccccc; position: absolute; top: 0; right: 0; bottom: 0; left: 0; background-color: #ffffff; padding: 7px 22px 8px 22px; -moz-transition: all 0.2s ease-in; -o-transition: all 0.2s ease-in; -webkit-transition: all 0.2s ease-in; transition: all 0.2s ease-in; border-radius:32px;}
+.select-styled:after {content: ""; width: 0; height: 0; border: 10px solid transparent; border-color: #21D1B0 transparent transparent transparent; position: absolute; top: 20px; right: 22px;}
+.select-styled:hover {background-color: #ffffff; color:#cccccc;}
+.select-styled:active, .select-styled.active {background-color: #ffffff; color:#cccccc; border-radius: 22px 22px 0 0;}
+.select-styled:active:after, .select-styled.active:after {top: 7px; border-color: transparent transparent #21D1B0 transparent;}
+.select-options {display: none; position: absolute; top: 100%; right: 0; left: 0; z-index: 999; margin:0; padding: 0; list-style: none; background-color: #ffffff; border-radius:0px 0px 8px 8px;}
+.select-options li {font-family: 'Roboto', sans-serif; font-size:14px; font-weight: 400; margin: 0; padding: 0 0 8px 0; text-indent: 22px; border-bottom: 1px solid #ffffff; -moz-transition: all 0.15s ease-in;
+  -o-transition: all 0.15s ease-in; -webkit-transition: all 0.15s ease-in; transition: all 0.15s ease-in; color:#000000;}
+.select-options li:hover {color: #21d1b0;}
+.select-options li[rel="hide"] {display: none;}
+.select-options li:last-child{border-bottom:none;}
+
+
+/*=====CUSTOM SELECT MENU CSS END HERE=====*/
+
+
+/*=====SIGNIN PAGE CSS START HERE=====*/
+
+body{background:#f3f3f3; margin:0; padding:0;}
+/*.header {width: 100%; overflow: hidden; position: fixed; top: 0; left: 0; z-index: 999; background-color: #21d1b0; -webkit-transition:all 0.5s ease; -moz-transition: all 0.5s ease; -ms-transition: all 0.5s ease; -o-transition: all 0.5s ease; transition: all 0.5s ease; padding:32px 0;}*/
+.header {width: 100%; overflow: hidden; background-color: #21d1b0; -webkit-transition:all 0.5s ease; -moz-transition: all 0.5s ease; -ms-transition: all 0.5s ease; -o-transition: all 0.5s ease; transition: all 0.5s ease; padding:32px 0;}
+.logo{width:225px; float:left; padding-top: 4px;}
+nav{float:right;}
+nav ul{margin:0; padding:0;}
+nav ul li{float:left; list-style:none; font-family: 'Raleway', sans-serif; font-weight: 800; font-size:14px; color:#b1eadc; text-transform:uppercase; letter-spacing:1px; margin-right:32px; line-height: 45px;}
+nav ul li a{color:#b1eadc; text-decoration:none;}
+nav ul li a:hover{color:#ffffff; text-decoration:none;}
+
+/*.header h1#logo {display: inline=block; height: 150px; float: left; margin-left:50px; font-family: "Oswald", sans-serif; font-size: 60px; color: white; font-weight: 400; -webkit-transition: all 0.3s;
+    -moz-transition: all 0.3s; -ms-transition: all 0.3s; -o-transition: all 0.3s; transition: all 0.3s;}*/
+/*.header nav {display: inline=block; float: right; margin-right:50px;}
+.header nav a {line-height: 150px; margin-left: 20px; color: #9fdbfc; font-weight: 700; font-size: 18px; -webkit-transition: all 0.3s; -moz-transition: all 0.3s; -ms-transition: all 0.3s; -o-transition: all 0.3s;
+    transition: all 0.3s;}
+.header nav a:hover {color: white;}*/
+/*.header.smaller {height: 75px;}
+.header.smaller h1#logo {width: 150px; height: 75px; font-size: 30px;}
+.header.smaller nav a {line-height: 75px;}*/
+
+.middle-body{padding:16px 0; float:left; width:100%;}
+.upload-btn-wrapper {position: relative; overflow: hidden; display: inline-block;}
+.upload-thumb {border: 8px solid #ffffff; color:#cccccc; padding: 50px 36px; border-radius: 24px; font-size: 12px; font-weight: bold; text-transform:uppercase; font-family: 'Raleway', sans-serif; letter-spacing:1px; cursor:pointer;}
+.upload-btn-wrapper input[type=file] {font-size: 100px; position: absolute; left: 0; top: 0; opacity: 0; cursor:pointer;}
+
+/*=====SIGNIN PAGE CSS END HERE=====*/
+
+/*=====TABBING PAGE CSS START HERE=====*/
+
+.subject-tab{background: transparent; display:flex;}
+.subject-tab .showSingle{flex:1; cursor:pointer;}
+.subject-tabbing-con{background: transparent; text-align:left; float:left; width:100%;}
+.subject-tabbing-con label{text-transform:uppercase; cursor:pointer;}
+.ico-checkbox{width:24px;height:24px;background:url(../images/ico-checkbox.png);display:inline-block;cursor:pointer;background-position:0 -24px;vertical-align:-6px;margin:0 16px 0 0;}
+.ico-checkbox.sed{background-position:0 0}
+.ico-checkbox.disabled{-webkit-filter:grayscale(100%);filter:grayscale(100%);cursor:default}
+.showSingle2{float:left; margin-right:32px; text-transform:uppercase; cursor:pointer;}
+.targetDiv2{float:left; width:100%;}
+
+/*=====TABBING PAGE CSS END HERE=====*/
+
+
+@media (max-width: 767px) {
+	
+/*=====MOBILE FONT SIZE CSS START HERE=====*/
+
+	
+.00{font-size:40px; line-height:60px;}
+.0{font-size:32px; line-height:50px;}
+.1{font-size:26px; line-height:40px;}
+.2{font-size:22px; line-height:30px;}
+.3{font-size:18px; line-height:25px;}
+.4{font-size:16px; line-height:20px;}
+.5{font-size:14px; line-height:17px;}
+.6{font-size:12px; line-height:15px;}
+.7{font-size:10px; line-height:12px;}
+
+/*=====MOBILE FONT SIZE CSS END HERE=====*/
+
+}

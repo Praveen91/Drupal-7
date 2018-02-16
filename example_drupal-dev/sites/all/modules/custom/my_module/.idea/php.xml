@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="PhpIncludePathManager">
+    <include_path>
+      <path value="$PROJECT_DIR$/../../../../../includes" />
+      <path value="$PROJECT_DIR$/../../../../../modules" />
+      <path value="$PROJECT_DIR$/../demo" />
+      <path value="$PROJECT_DIR$/../lotus" />
+      <path value="$PROJECT_DIR$/../mymodule" />
+      <path value="$PROJECT_DIR$/../ajaxforms" />
+      <path value="$PROJECT_DIR$/../windfarms" />
+      <path value="$PROJECT_DIR$/../customform" />
+      <path value="$PROJECT_DIR$/../ukuni_form" />
+      <path value="$PROJECT_DIR$/../ws_testing" />
+      <path value="$PROJECT_DIR$/../custom_ajax" />
+      <path value="$PROJECT_DIR$/../custom_form" />
+      <path value="$PROJECT_DIR$/../merc_global" />
+      <path value="$PROJECT_DIR$/../videoentity" />
+      <path value="$PROJECT_DIR$/../dynamic_theme" />
+      <path value="$PROJECT_DIR$/../modal_example" />
+      <path value="$PROJECT_DIR$/../multi_example" />
+      <path value="$PROJECT_DIR$/../custom_hookapi" />
+      <path value="$PROJECT_DIR$/../d7-registration" />
+      <path value="$PROJECT_DIR$/../webform_theming" />
+      <path value="$PROJECT_DIR$/../custom_view_mode" />
+      <path value="$PROJECT_DIR$/../angularjs_example" />
+      <path value="$PROJECT_DIR$/../custom_admin_form" />
+      <path value="$PROJECT_DIR$/../../contrib" />
+    </include_path>
+  </component>
+</project>

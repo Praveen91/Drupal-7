@@ -1,0 +1,4 @@
+name = Custom view mode
+description = An example how to create view mode using program.
+core = 7.x
+package = custom

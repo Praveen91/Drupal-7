@@ -1,0 +1,45 @@
+<?php
+
+/**
+ * Implements hook_menu_alter
+ */
+function custom_hookapi_menu_alter(&$items){
+  $items['node/%node/edit']['access callback'] = 'custom_hookapi_check_node_access';
+}
+
+
+function custom_hookapi_check_node_access($op, $node) {
+   global $user;
+   
+  // echo REQUEST_TIME;
+
+   if (($op == 'update') && (!user_access('administer nodes'))) {
+   	if ($user->uid == $node->uid) {
+    return FALSE;
+    //return NODE_ACCESS_DENY;
+   }
+  }
+}
+
+
+
+/**
+ * Implements hook_user_login().
+ */
+function custom_hookapi_user_login(&$edit, $account) {
+  // If the user has a NULL time zone, notify them to set a time zone.
+  /*
+   *if (!$user->timezone && variable_get('configurable_timezones', 1) && variable_get('empty_timezone_message', 0)) {
+   *  drupal_set_message(t('Configure your <a href="@user-edit">account time zone setting</a>.', array('@user-edit' => url("user/$user->uid/edit", array('query' => drupal_get_destination(), 'fragment' => 'edit-timezone')))));
+   *}
+   */
+  /* Your code here */
+
+  if (REQUEST_TIME == '1509706971') {
+    drupal_set_message(t('Your time limit exceeded'));
+  	user_logout();
+  	return FALSE;
+  }
+
+
+}

@@ -1,0 +1,6 @@
+name = Modal Example using ctools
+descripttion = An modal example using ctools and manage theming for modal.
+core = 7.x
+package = Custom
+dependancies[] = ctools
+dependencies[] = views

@@ -1,0 +1,4 @@
+name = Custom admin form
+description = Custom form for admin.
+core = 7.x
+package = Custom
